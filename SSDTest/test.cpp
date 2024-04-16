@@ -36,8 +36,15 @@ TEST_F(SSDTest, Read_test) {
 	// TODO
 }
 
-TEST_F(SSDTest, Write_test) {
-	// TODO
+TEST_F(SSDTest, Write_test_normal_success) {
+	int testLBA = 0;
+	EXPECT_CALL(m_nand_, read(testLBA))
+		.WillOnce(Return("0xAAAABBBB"));
+	EXPECT_THAT(ssd_.read(testLBA), Eq("0xAAAABBBB"));
+}
+
+TEST_F(SSDTest, Write_test_out_of_range_fail) {
+	EXPECT_THAT(ssd_.read(-1), Eq("0x00000000")) << "Check invalid scope";
 }
 
 // TODO

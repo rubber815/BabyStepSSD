@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #include "../SSDProject/INAND.cpp"
 
 class SSD {
@@ -11,7 +13,15 @@ public:
 		// TODO
 	}
 	std::string read(int lba) {
-		// TODO
+		std::string str;
+		if (lba < 0 || lba > 100) {
+			std::cout << "Exceeds LBA scope!" << std::endl;
+			str = "0x00000000";
+		}
+		else {
+			str = nand_->read(lba);
+		}
+		return str;
 	}
 private:
 	INAND * nand_;
