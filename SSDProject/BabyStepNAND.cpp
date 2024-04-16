@@ -4,37 +4,53 @@
 
 class BabyStepNand : public INAND {
 public:
+	// To-do (initialize buffer)
+	// void BabyStepNand();
+
 	void write(int lba, std::string value) override;
 	std::string read(int lba) override;
 
 private:
-
+	std::vector<std::string> buffer;
 };
 
-void
-BabyStepNand::write(int lba, std::string value) {
-	// To-do
-	/*
-	vector<std::string> nandData = { "0x12345678", "0x77777777" };
-	int len = static_cast<int>(nandData.size());
+void BabyStepNand::write(int lba, std::string value) {
+	// Read All NAND
+	std::ifstream readFromNand;
+	readFromNand.open("nand.txt");
 
-	ofstream writeToNand;
-		writeToNand.open("nand.txt");
+	if (readFromNand.is_open()) {
+		this->buffer.clear();
 
-		for (int i = 0; i < len; i++) {
-			std::string tmp = nandData[i];
-			if (i != len - 1) {
-				tmp += "\n";
-			}
-
-			writeToNand.write(tmp.c_str(), tmp.size());
+		while (!readFromNand.eof()) {
+			std::string tmp;
+			getline(readFromNand, tmp);
+			this->buffer.push_back(tmp);
 		}
-		writeToNand.close();
-	*/
+	}
+
+
+	// Modify NAND data
+	buffer[lba] = value;
+
+
+	// Write All NAND
+	int len = static_cast<int>(buffer.size());
+
+	std::ofstream writeToNand;
+	writeToNand.open("nand.txt");
+
+	for (int i = 0; i < len; i++) {
+		std::string tmp = buffer[i];
+		if (i != len - 1) {
+			tmp += "\n";
+		}
+		writeToNand.write(tmp.c_str(), tmp.size());
+	}
+	writeToNand.close();
 }
 
-std::string
-BabyStepNand::read(int lba) {
+std::string BabyStepNand::read(int lba) {
 	// To-do
 	std::string data;
 
