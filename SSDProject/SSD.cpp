@@ -4,7 +4,7 @@
 
 class SSD {
 public:
-	void selectStockBrocker(INAND* nand) {
+	void selectNAND(INAND* nand) {
 		nand_ = nand;
 	}
 	void write(int lba, int value) {
