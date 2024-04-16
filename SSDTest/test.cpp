@@ -75,8 +75,8 @@ TEST_F(SSDTest, Write_test_normal_success) {
 
 	int testLBA2 = 30;
 	EXPECT_CALL(m_nand_, read(testLBA2))
-		.WillOnce(Return("0xAAAABBBB"));
-	EXPECT_THAT(ssd_.read(testLBA2), Eq("0xAAAABBBB"));
+		.WillOnce(Return("0x0000AAAA"));
+	EXPECT_THAT(ssd_.read(testLBA2), Eq("0x0000AAAA"));
 }
 
 TEST_F(SSDTest, Write_test_boundary_check_fail) {
