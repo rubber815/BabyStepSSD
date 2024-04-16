@@ -25,23 +25,26 @@ public:
 
 private:
 	std::vector<std::string> buffer;
+
+	void openNand() {
+		// Read All NAND
+		std::ifstream readFromNand;
+		readFromNand.open("nand.txt");
+
+		if (readFromNand.is_open()) {
+			this->buffer.clear();
+
+			while (!readFromNand.eof()) {
+				std::string tmp;
+				getline(readFromNand, tmp);
+				this->buffer.push_back(tmp);
+			}
+		}
+	}
 };
 
 void BabyStepNand::write(int lba, std::string value) {
-	// Read All NAND
-	std::ifstream readFromNand;
-	readFromNand.open("nand.txt");
-
-	if (readFromNand.is_open()) {
-		this->buffer.clear();
-
-		while (!readFromNand.eof()) {
-			std::string tmp;
-			getline(readFromNand, tmp);
-			this->buffer.push_back(tmp);
-		}
-	}
-
+	openNand();
 
 	// Modify NAND data
 	buffer[lba] = value;
@@ -64,6 +67,8 @@ void BabyStepNand::write(int lba, std::string value) {
 }
 
 std::string BabyStepNand::read(int lba) {
+	openNand();
+
 	// To-do
 	std::string data;
 
