@@ -96,7 +96,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="test.cpp" />
+    <ClCompile Include="nand_test.cpp" />
+    <ClCompile Include="ssd_test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SSDProject\SSDProject.vcxproj">
