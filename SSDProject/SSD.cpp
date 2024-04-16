@@ -9,7 +9,6 @@ public:
 		nand_ = nand;
 	}
 	void write(int lba, std::string value) {
-		// TODO
 		if (lba < 0 || lba > 100)
 			throw std::invalid_argument("lba is incorrect");
 

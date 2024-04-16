@@ -34,14 +34,12 @@ public:
 };
 
 TEST_F(SSDTest, Read_lba_test) {
-	// TODO
 	EXPECT_CALL(m_nand_, write(0, "0x00000000"))
 		.Times(1);
 	ssd_.write(0, "0x00000000");
 }
 
 TEST_F(SSDTest, Read_lower_lba_fail_test) {
-	// TODO
 	EXPECT_CALL(m_nand_, write(-1, "0x00000000"))
 		.Times(0);
 
@@ -49,7 +47,6 @@ TEST_F(SSDTest, Read_lower_lba_fail_test) {
 }
 
 TEST_F(SSDTest, Read_upper_lba_fail_test) {
-	// TODO
 	EXPECT_CALL(m_nand_, write(101, "0x00000000"))
 		.Times(0);
 
@@ -57,7 +54,6 @@ TEST_F(SSDTest, Read_upper_lba_fail_test) {
 }
 
 TEST_F(SSDTest, Read_data_out_of_rang_fail_test) {
-	// TODO
 	EXPECT_CALL(m_nand_, write(0, "0x0000000000"))
 		.Times(0);
 
@@ -65,7 +61,6 @@ TEST_F(SSDTest, Read_data_out_of_rang_fail_test) {
 }
 
 TEST_F(SSDTest, Read_data_prefix_fail_test) {
-	// TODO
 	EXPECT_CALL(m_nand_, write(0, "xx00000000"))
 		.Times(0);
 
