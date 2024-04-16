@@ -84,4 +84,19 @@ TEST_F(SSDTest, Write_test_boundary_check_fail) {
 	EXPECT_THAT(ssd_.read(100), Eq("0x00000000")) << "Check invalid scope";
 }
 
+TEST_F(SSDTest, Read_test_not_written_lba) {
+	{
+		InSequence seq;
+		EXPECT_CALL(m_nand_, write(20, "0x1289CDEF"))
+			.Times(1);
+		EXPECT_CALL(m_nand_, read(20))
+			.WillOnce(Return("0x1289CDEF"));
+		EXPECT_CALL(m_nand_, read(10))
+			.WillOnce(Return("0x00000000"));
+	}
+	ssd_.write(20, "0x1289CDEF");
+	EXPECT_THAT(ssd_.read(20), Eq("0x1289CDEF"));
+	EXPECT_THAT(ssd_.read(10), Eq("0x00000000"));
+}
+
 // TODO
