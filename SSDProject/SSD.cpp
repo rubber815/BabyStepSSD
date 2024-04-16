@@ -7,10 +7,10 @@ public:
 	void selectNAND(INAND* nand) {
 		nand_ = nand;
 	}
-	void write(int lba, int value) {
+	void write(int lba, std::string value) {
 		// TODO
 	}
-	int read(int lba) {
+	std::string read(int lba) {
 		// TODO
 	}
 private:
