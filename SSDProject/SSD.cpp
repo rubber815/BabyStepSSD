@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 
 #include "../SSDProject/INAND.cpp"
 
@@ -20,6 +21,15 @@ public:
 		}
 		else {
 			str = nand_->read(lba);
+		}
+
+		std::ofstream outputFile("result.txt");
+		if (!outputFile) {
+			std::cout << "Failed to open file for writing." << std::endl;
+		}
+		else {
+			outputFile << str << std::endl;
+			outputFile.close();
 		}
 		return str;
 	}
