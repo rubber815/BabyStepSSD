@@ -4,8 +4,21 @@
 
 class BabyStepNand : public INAND {
 public:
-	// To-do (initialize buffer)
-	// void BabyStepNand();
+	BabyStepNand() {
+		int len = 100;
+
+		std::ofstream writeToNand;
+		writeToNand.open("nand.txt");
+
+		for (int i = 0; i < len; i++) {
+			std::string tmp = "0x00000000";
+			if (i != len - 1) {
+				tmp += "\n";
+			}
+			writeToNand.write(tmp.c_str(), tmp.size());
+		}
+		writeToNand.close();
+	}
 
 	void write(int lba, std::string value) override;
 	std::string read(int lba) override;
