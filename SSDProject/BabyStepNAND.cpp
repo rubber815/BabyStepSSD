@@ -1,3 +1,5 @@
+#pragma once
+
 #include "INAND.cpp"
 #include <fstream>
 #include <vector>
