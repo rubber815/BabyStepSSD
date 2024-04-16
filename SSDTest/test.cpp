@@ -4,6 +4,7 @@
 #include <gmock/gmock.h>
 #include "../SSDProject/INAND.cpp"
 #include "../SSDProject/SSD.cpp"
+
 using namespace testing;
 
 /*
@@ -21,6 +22,22 @@ public:
 	MOCK_METHOD(int, read, (int), (override));
 };
 
-TEST(TestCaseName, TestName) {
-	MockNAND n;
+class SSDTest : public testing::Test {
+protected:
+	void SetUp() override {
+		ssd_.selectNAND(&m_nand_);
+	}
+public:
+	SSD ssd_;
+	MockNAND m_nand_;
+};
+
+TEST_F(SSDTest, Read_test) {
+	// TODO
 }
+
+TEST_F(SSDTest, Write_test) {
+	// TODO
+}
+
+// TODO
