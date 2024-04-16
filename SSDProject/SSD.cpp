@@ -23,7 +23,7 @@ public:
 	}
 	std::string read(int lba) {
 		std::string str;
-		if (lba < 0 || lba > 100) {
+		if (lba < 0 || lba >= 100) {
 			std::cout << "Exceeds LBA scope!" << std::endl;
 			str = "0x00000000";
 		}
