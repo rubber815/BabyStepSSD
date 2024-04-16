@@ -43,8 +43,12 @@ TEST_F(SSDTest, Write_test_normal_success) {
 	EXPECT_THAT(ssd_.read(testLBA), Eq("0xAAAABBBB"));
 }
 
-TEST_F(SSDTest, Write_test_out_of_range_fail) {
+TEST_F(SSDTest, Write_test_out_of_range_fail1) {
 	EXPECT_THAT(ssd_.read(-1), Eq("0x00000000")) << "Check invalid scope";
+}
+
+TEST_F(SSDTest, Write_test_out_of_range_fail2) {
+	EXPECT_THAT(ssd_.read(100), Eq("0x00000000")) << "Check invalid scope";
 }
 
 // TODO
