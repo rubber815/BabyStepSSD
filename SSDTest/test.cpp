@@ -56,6 +56,22 @@ TEST_F(SSDTest, Read_upper_lba_fail_test) {
 	EXPECT_THROW(ssd_.write(101, "0x00000000"), std::invalid_argument);
 }
 
+TEST_F(SSDTest, Read_data_out_of_rang_fail_test) {
+	// TODO
+	EXPECT_CALL(m_nand_, write(0, "0x0000000000"))
+		.Times(0);
+
+	EXPECT_THROW(ssd_.write(0, "0x0000000000"), std::invalid_argument);
+}
+
+TEST_F(SSDTest, Read_data_prefix_fail_test) {
+	// TODO
+	EXPECT_CALL(m_nand_, write(0, "xx00000000"))
+		.Times(0);
+
+	EXPECT_THROW(ssd_.write(0, "xx00000000"), std::invalid_argument);
+}
+
 TEST_F(SSDTest, Write_test) {
 	// TODO
 }
