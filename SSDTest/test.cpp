@@ -4,6 +4,7 @@
 #include <gmock/gmock.h>
 #include "../SSDProject/INAND.cpp"
 #include "../SSDProject/SSD.cpp"
+#include <stdexcept>
 
 using namespace testing;
 
@@ -32,8 +33,27 @@ public:
 	MockNAND m_nand_;
 };
 
-TEST_F(SSDTest, Read_test) {
+TEST_F(SSDTest, Read_lba_test) {
 	// TODO
+	EXPECT_CALL(m_nand_, write(0, "0x00000000"))
+		.Times(1);
+	ssd_.write(0, "0x00000000");
+}
+
+TEST_F(SSDTest, Read_lower_lba_fail_test) {
+	// TODO
+	EXPECT_CALL(m_nand_, write(-1, "0x00000000"))
+		.Times(0);
+
+	EXPECT_THROW(ssd_.write(-1, "0x00000000"), std::invalid_argument);
+}
+
+TEST_F(SSDTest, Read_upper_lba_fail_test) {
+	// TODO
+	EXPECT_CALL(m_nand_, write(101, "0x00000000"))
+		.Times(0);
+
+	EXPECT_THROW(ssd_.write(101, "0x00000000"), std::invalid_argument);
 }
 
 TEST_F(SSDTest, Write_test) {
