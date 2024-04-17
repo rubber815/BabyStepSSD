@@ -12,13 +12,23 @@ public:
 		nand_ = nand;
 	}
 	void write(int lba, std::string value) {
-		checkLbaRange(lba);
-		checkValue(value);
+		try {
+			checkLbaRange(lba);
+			checkValue(value);
+		}
+		catch (std::exception e) {
+			return;
+		}
 
 		nand_->write(lba, value);
 	}
 	std::string read(int lba) {	
-		checkLbaRange(lba);
+		try {
+			checkLbaRange(lba);
+		}
+		catch (std::exception e) {
+			return;
+		}
 
 		std::string value = nand_->read(lba);
 		writeToResultFile(value);
