@@ -31,6 +31,7 @@ private:
 	const int MAX_LBA = 99;
 	const int VALUE_LENGTH = 10;
 	const std::string PREFIX_VALUE = "0x";
+	const std::string RESULT_FILE_NAME = "result.txt";
 
 	void checkLbaRange(int lba) {
 		if (lba < MIN_LBA || lba > MAX_LBA)
@@ -45,7 +46,7 @@ private:
 	}
 
 	void writeToResultFile(std::string value) {
-		std::ofstream outputFile("result.txt");
+		std::ofstream outputFile(RESULT_FILE_NAME);
 		if (!outputFile) {
 			std::cout << "Failed to open file for writing." << std::endl;
 		}
