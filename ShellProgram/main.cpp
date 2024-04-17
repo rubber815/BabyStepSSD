@@ -40,6 +40,22 @@ bool fullRead() {
 	return false;
 }
 
+std::string readFromResultFile() {
+	const std::string RESULT_FILE_NAME = "result.txt";
+	std::ifstream inputFile(RESULT_FILE_NAME);
+	std::string value;
+
+	if (!inputFile.is_open()) {
+		std::cout << "Failed to open file for reading." << std::endl;
+		return value;
+	}
+	std::getline(inputFile, value);
+
+	inputFile.close();
+	return value;
+
+}
+
 bool testApp1() {
 	/*	Full Write + ReadCompare
 	1. fullwrite
@@ -56,6 +72,11 @@ bool testApp1() {
 		std::string cmd = "SSDProject R ";
 		cmd += std::to_string(lba);
 		system(cmd.c_str());
+
+		// Compare
+		std::string read_val = readFromResultFile();
+		if (read_val != input1)
+			return false;
 	}
 
 	return true;
@@ -121,7 +142,10 @@ int main() {
 			fullRead();
 		}
 		else if (operation == "testapp1") {
-			testApp1();
+			if (testApp1())
+				std::cout << "testapp1: Compare Success!" << std::endl;
+			else
+				std::cout << "testapp1: Compare Fail!" << std::endl;
 		}
 		else if (operation == "testapp2")
 			testApp2();
