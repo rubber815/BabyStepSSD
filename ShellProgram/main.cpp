@@ -6,8 +6,20 @@
 #include <cstdlib> // For system() function
 
 bool verifyCommandFormat(const std::string& command) {
-	// TODO
-	return true;
+	std::string operation;
+	std::istringstream iss(command);
+	iss >> operation;
+	if (operation == "write" ||
+		operation == "read" ||
+		operation == "exit" ||
+		operation == "help" ||
+		operation == "fullwrite" ||
+		operation == "fullread") {
+		return true;
+	}
+
+	std::cout << "INVALID COMMAND" << std::endl;
+	return false;
 }
 
 bool help() {
@@ -59,10 +71,8 @@ int main() {
 		std::cout << "Welcome to ShellProgram!!: "; // Updated prompt
 		std::getline(std::cin, command);
 
-		if (!(verifyCommandFormat(command))) {
-			std::cout << "FATAL: INVALID_FORMAT!" << std::endl;
+		if (!(verifyCommandFormat(command)))
 			continue;
-		}
 
 		// parsing commands
 		std::istringstream iss(command);
