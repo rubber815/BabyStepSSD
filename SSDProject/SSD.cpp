@@ -65,6 +65,10 @@ public:
 			return true;
 		}
 
+		if (op == "testapp2") {
+			return true;
+		}
+
 		/*RW op formant not verified!!!*/
 		return false;
 	}
