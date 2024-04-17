@@ -17,9 +17,8 @@ int main() {
 		iss >> operation;
 
 		// Execute the .exe file
-		system("C:\\Users\\User\\source\\repos\\SSDProject\\x64\\Debug\\SSDProject.exe W 1 0x11111111");
-		system("C:\\Users\\User\\source\\repos\\SSDProject\\x64\\Debug\\SSDProject.exe W 2 0x22222222");
-		system("C:\\Users\\User\\source\\repos\\SSDProject\\x64\\Debug\\SSDProject.exe R 1");
-		//system("C:\\Users\\User\\source\\repos\\SSDProject\\x64\\Debug\\SSDProject.exe W 2 0x22222222");
+		system("SSDProject W 1 0x11111111");
+		system("SSDProject W 2 0x22222222");
+		system("SSDProject R 1");
 	}
 }
