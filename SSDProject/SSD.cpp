@@ -93,6 +93,12 @@ private:
 			|| (value.substr(0, 2) != PREFIX_VALUE)) {
 			throw std::invalid_argument("value is incorrect");
 		}
+
+		for (int i = 2; i < value.length(); i++) {
+			if (value[i] < '0' || value[i] > '9' 
+				|| value[i] < 'A' || value[i] > 'F')
+				throw std::invalid_argument("value is incorrect");
+		}
 	}
 
 	void writeToResultFile(std::string value) {
