@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include "../SSDProject/SSD.cpp"
+#include "../SSDProject/BabyStepNand.cpp"
 
 SSD* initSSD() {
 	return new SSD();
@@ -44,6 +45,8 @@ int main() {
 	int lba;
 
 	SSD* babyStepSSD = initSSD();
+	BabyStepNand* babyStepNand = new BabyStepNand();
+	babyStepSSD->selectNAND(babyStepNand);
 
 	while (true) {
 		std::cout << "Welcome to BabyStepNand!!: "; // Updated prompt
