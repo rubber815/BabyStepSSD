@@ -48,7 +48,8 @@ public:
 			try {
 				checkValue(val);
 			}
-			catch(std::exception e) {
+			catch (std::invalid_argument e) {
+				std::cout << e.what() << std::endl;
 				return false;
 			}
 			return true;
@@ -95,15 +96,16 @@ private:
 	}
 
 	void checkValue(std::string value) {
-		if (value.length() != VALUE_LENGTH
-			|| (value.substr(0, 2) != PREFIX_VALUE)) {
-			throw std::invalid_argument("value is incorrect");
-		}
+		if (value.length() != VALUE_LENGTH)
+			throw std::invalid_argument("VALUE has a maximum length of 10.");
+
+		if (value.substr(0, 2) != PREFIX_VALUE)
+			throw std::invalid_argument("VALUE must be entered as 0x in hexadecimal.");
 
 		for (int i = 2; i < value.length(); i++) {
-			if (value[i] < '0' || value[i] > '9' 
-				|| value[i] < 'A' || value[i] > 'F')
-				throw std::invalid_argument("value is incorrect");
+			if (!(value[i] >= '0' && value[i] <= '9')
+				&& !(value[i] >= 'A' && value[i] <= 'F'))
+				throw std::invalid_argument("VALUE can be entered from 0 to 9 or A to F.");
 		}
 	}
 
