@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <fstream>
-
+#include <sstream>
 #include "../SSDProject/INAND.cpp"
 #include <stdexcept>
 
@@ -23,6 +23,41 @@ public:
 		std::string value = nand_->read(lba);
 		writeToResultFile(value);
 		return value;
+	}
+
+	// TODO
+	bool verifyCommandFormat(const std::string& command) {
+		std::istringstream iss(command);
+		std::string op;
+		int lba;
+
+		/*exit: terminate shell*/
+		if (command == "exit") {
+			return true;
+		}
+
+		/*help: print the usage for each command.*/
+		if (command == "help") {
+			return true;
+		}
+
+		/*RW op format verification*/
+		if (command == "fullwrite" || command == "fullread") {
+			// TODO: detail format check
+			return true;
+		}
+
+		if (!(iss >> op >> lba)) {
+			return false;
+		}
+		if (op == "write" || op == "read") {
+
+			// TODO: detail format check
+			return true;
+		}
+
+		/*RW op formant not verified!!!*/
+		return false;
 	}
 private:
 	INAND * nand_;
