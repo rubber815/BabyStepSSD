@@ -40,8 +40,8 @@ bool mainFullRead() {
 
 int main() {
 	//FAKE_SSD ssd;
-	std::string command, operation;
-	int lba, value;
+	std::string command, operation, value;
+	int lba;
 
 	SSD* babyStepSSD = initSSD();
 
