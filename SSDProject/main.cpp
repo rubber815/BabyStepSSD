@@ -3,39 +3,38 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include "../SSDProject/SSD.cpp"
 
-bool verifyCommandFormat(const std::string& command) {
-	std::istringstream iss(command);
-	std::string op;
-	int lba;
+SSD* initSSD() {
+	return new SSD();
+}
 
-	/*exit: terminate shell*/
-	if (command == "exit") {
-		return true;
-	}
+void terminateSSD(SSD* ssd) {
+	delete ssd;
+}
 
-	/*help: print the usage for each command.*/
-	if (command == "help") {
-		return true;
-	}
-
-	/*RW op format verification*/
-	if (command == "fullwrite" || command == "fullread") {
-		// TODO: detail format check
-		return true;
-	}
-
-	if (!(iss >> op >> lba)) {
-			return false;
-	}
-	if (op == "write" || op == "read") {
-
-		// TODO: detail format check
-		return true;
-	}
-
-
-	/*RW op formant not verified!!!*/
+bool mainHelp() {
+	// TODO
+	return false;
+}
+bool mainExit() {
+	// TODO
+	return false;
+}
+bool mainWrite() {
+	// TODO
+	return false;
+}
+bool mainRead() {
+	// TODO
+	return false;
+}
+bool mainFullWrite() {
+	// TODO
+	return false;
+}
+bool mainFullRead() {
+	// TODO
 	return false;
 }
 
@@ -44,24 +43,30 @@ int main() {
 	std::string command, operation;
 	int lba, value;
 
+	SSD* babyStepSSD = initSSD();
+
 	while (true) {
 		std::cout << "Welcome to BabyStepNand!!: "; // Updated prompt
 		std::getline(std::cin, command);
 
-		if (!verifyCommandFormat(command)) {
+		if (!(babyStepSSD->verifyCommandFormat(command))) {
 			std::cout << "FATAL: INVALID_FORMAT!" << std::endl;
 			continue;
 		}
-
+		
+		// parsing commands
 		std::istringstream iss(command);
 		iss >> operation >> lba;
 
+		// TODO: mainExit()
 		// Added exit condition
 		if (operation == "exit") {
+			terminateSSD(babyStepSSD);
 			std::cout << "Exiting the program." << std::endl;
 			break;
 		}
 
+		// TODO: mainHelp()
 		if (operation == "help") {
 			std::cout << std::endl;
 			std::cout << "[BabyStepNand commands help]" << std::endl;
@@ -78,28 +83,30 @@ int main() {
 		/*RW commands*/
 		if (operation == "write") {
 			iss >> value;
-			// Pseudo code
-			// TODO: ssd.write(lba, value);
+			// TODO: mainRead();
+
+			// TODO: will be removed
 			std::cout << "Write successful." << std::endl;
 			std::cout << "[LBA]: " << lba << "[Value]: " << value << std::endl;
 		}
 		else if (operation == "read") {
-			// Pseudo code
-			//int read_value = ssd.read(lba);
-			//if (read_value != -1)
-			//	cout << "Read successful. Value at LBA " << lba << ": " << read_value << endl;
-			//else
-			//	cout << "Read failed. LBA " << lba << " is empty." << endl;
+			// TODO: mainWrite();
+
+			// TODO: will be removed
 			std::cout << "Read successful." << std::endl;
 			std::cout << "[LBA]: " << lba << "[Read Value]: 0x1111" << std::endl;
 		}
 		else if (operation == "fullwrite") {
-			// TODO
+			// TODO: mainFullWrite();
+
+			// TODO: will be removed
 			std::cout << "FullWrite successful." << std::endl;
 			std::cout << "[LBA]: 0 ~ 99 [Write Value]: 0x1111" << std::endl;
 		}
 		else if (operation == "fullread") {
-			// TODO
+			// TODO: mainFullRead();
+
+			// TODO: will be removed
 			std::cout << "FullRead successful." << std::endl;
 			std::cout << "[LBA]: 0 ~ 99 [Read Value]: 0x1111" << std::endl;
 		}
