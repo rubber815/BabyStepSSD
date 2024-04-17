@@ -107,6 +107,7 @@ bool testApp2() {
 
 int main() {
 	std::string command, operation, lba, value;
+	
 	while (true) {
 		std::cout << "Welcome to ShellProgram!!: "; // Updated prompt
 		std::getline(std::cin, command);
