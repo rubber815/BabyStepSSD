@@ -17,8 +17,23 @@ public:
 		writeAllNand();
 	}
 
-	void write(int lba, std::string value) override;
-	std::string read(int lba) override;
+	void write(int lba, std::string value) override {
+		readAllNand();
+
+		// Modify NAND data
+		m_buffer[lba] = value;
+
+		writeAllNand();
+	}
+
+	std::string read(int lba) override {
+		readAllNand();
+
+		// Read NAND data
+		std::string data{ m_buffer[lba] };
+
+		return data;
+	}
 
 private:
 	std::vector<std::string> m_buffer;
@@ -56,21 +71,3 @@ private:
 		writeToNand.close();
 	}
 };
-
-void BabyStepNand::write(int lba, std::string value) {
-	readAllNand();
-
-	// Modify NAND data
-	m_buffer[lba] = value;
-
-	writeAllNand();
-}
-
-std::string BabyStepNand::read(int lba) {
-	readAllNand();
-
-	// Read NAND data
-	std::string data{ m_buffer[lba] };
-
-	return data;
-}

@@ -3,8 +3,8 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
-#include "../SSDProject/SSD.cpp"
-#include "../SSDProject/BabyStepNand.cpp"
+#include "SSD.cpp"
+#include "BabyStepNAND.cpp"
 
 SSD* initSSD() {
 	return new SSD();
