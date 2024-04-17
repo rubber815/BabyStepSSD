@@ -41,9 +41,24 @@ bool fullRead() {
 }
 
 bool testApp1() {
-	// TODO
-	//system("");
-	return false;
+	/*	Full Write + ReadCompare
+	1. fullwrite
+	2. fullread + readcompare
+	*/
+	const std::string input1 = "0xABCDEFAB";
+	for (int lba = 0; lba < 100; lba++) {
+		std::string cmd = "SSDProject W ";
+		cmd += std::to_string(lba);
+		cmd += " " + input1;
+		system(cmd.c_str());
+	}
+	for (int lba = 0; lba < 100; lba++) {
+		std::string cmd = "SSDProject R ";
+		cmd += std::to_string(lba);
+		system(cmd.c_str());
+	}
+
+	return true;
 }
 
 bool testApp2() {
@@ -54,6 +69,7 @@ bool testApp2() {
 
 int main() {
 	std::string command, operation, lba, value;
+	std::string cmd = "SSDProject ";
 
 	while (true) {
 		std::cout << "Welcome to ShellProgram!!: "; // Updated prompt
