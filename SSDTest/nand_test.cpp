@@ -26,7 +26,7 @@ TEST(NANDTest, Nand_single_write_read_test) {
 
 TEST_F(SSDTestWithBabyStepNand, Write_lba_test_with_BabyStep) {
 	ssd_.write(0x4, "0x00000003");
-	EXPECT_EQ("0x0000000d3",ssd_.read(0x4));
+	EXPECT_EQ("0x00000003",ssd_.read(0x4));
 }
 
 	
