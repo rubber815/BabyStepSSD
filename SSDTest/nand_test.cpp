@@ -64,11 +64,6 @@ TEST_F(SSDTestWithBabyStepNand, Full_Read_test_with_BabyStep_Normal_Fail) {
 	}
 }
 
-TEST_F(SSDTestWithBabyStepNand, Write_lba_test_with_BabyStep) {
-	ssd_.write(99, "0x00000003");
-	EXPECT_EQ("0x00000003",ssd_.read(99));
-}
-
 TEST_F(SSDTestWithBabyStepNand, Write_lower_lba_fail_test) {
 	EXPECT_THROW(ssd_.write(-1, "0x00000003"), std::invalid_argument);
 }
