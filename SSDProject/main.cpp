@@ -64,6 +64,36 @@ bool mainTestApp1(SSD* ssd) {
 	return true;
 }
 
+void mainTestApp2(SSD* ssd) {
+	const int agingCnt = 30;
+	const int maxLba = 5;
+	const std::string value1 = "0xAAAABBBB";
+	const std::string value2 = "0x12345678";
+	for (int i = 0; i < agingCnt; i++) {
+		for (int lba = 0; lba <= maxLba; lba++)
+			ssd->write(lba, value1);
+	}
+
+	for (int lba = 0; lba <= maxLba; lba++)
+		ssd->write(lba, value2);
+
+	for (int lba = 0; lba <= maxLba; lba++) {
+		std::string retValue = ssd->read(lba);
+		if (retValue == value2) {
+			std::cout << "TestApp2: Read compare after "
+				"write aging: Passed, LBA: " << lba
+				<< ", Expected: " << value2 << ", Actual: "
+				<< retValue << std::endl;
+		}
+		else {
+			std::cout << "TestApp2: Read compare after "
+				"write aging: Failed, LBA: " << lba
+				<< ", Expected: " << value2 << ", Actual: "
+				<< retValue << std::endl;
+		}
+	}
+}
+
 int main() {
 	//FAKE_SSD ssd;
 	std::string command, operation, lba, value;
@@ -138,6 +168,8 @@ int main() {
 			mainTestApp1(babyStepSSD);
 			std::cout << "TestApp1 successful." << std::endl;
 		}
+		else if (operation == "testapp2")
+			mainTestApp2(babyStepSSD);
 	}
 
 	return 0;
