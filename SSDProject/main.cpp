@@ -41,8 +41,7 @@ bool mainFullRead() {
 
 int main() {
 	//FAKE_SSD ssd;
-	std::string command, operation, value;
-	int lba;
+	std::string command, operation, lba, value;
 
 	SSD* babyStepSSD = initSSD();
 	BabyStepNand* babyStepNand = new BabyStepNand();
@@ -59,7 +58,7 @@ int main() {
 		
 		// parsing commands
 		std::istringstream iss(command);
-		iss >> operation >> lba;
+		iss >> operation;
 
 		// TODO: mainExit()
 		// Added exit condition
@@ -85,6 +84,7 @@ int main() {
 
 		/*RW commands*/
 		if (operation == "write") {
+			iss >> lba;
 			iss >> value;
 			// TODO: mainRead();
 
@@ -93,6 +93,7 @@ int main() {
 			std::cout << "[LBA]: " << lba << "[Value]: " << value << std::endl;
 		}
 		else if (operation == "read") {
+			iss >> lba;
 			// TODO: mainWrite();
 
 			// TODO: will be removed
@@ -100,6 +101,7 @@ int main() {
 			std::cout << "[LBA]: " << lba << "[Read Value]: 0x1111" << std::endl;
 		}
 		else if (operation == "fullwrite") {
+			iss >> value;
 			// TODO: mainFullWrite();
 
 			// TODO: will be removed
