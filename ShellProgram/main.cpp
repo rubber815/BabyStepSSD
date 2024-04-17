@@ -110,10 +110,63 @@ bool testApp1() {
 	return true;
 }
 
+std::string readFromResultFile() {
+	const std::string RESULT_FILE_NAME = "result.txt";
+	std::ifstream inputFile(RESULT_FILE_NAME);
+	std::string value;
+
+	if (!inputFile.is_open()) {
+		std::cout << "Failed to open file for reading." << std::endl;
+		return value;
+	}
+	std::getline(inputFile, value);
+
+	inputFile.close();
+	return value;
+
+}
 bool testApp2() {
-	// TODO
-	//system("");
-	return false;
+	const int agingCnt = 30;
+	const int maxLba = 5;
+	const std::string value1 = "0xAAAABBBB";
+	const std::string value2 = "0x12345678";
+
+
+	std::string cmd = R"(SSDProject W )" + std::to_string(3) + " " + std::string(value1);
+	system(cmd.c_str());
+
+	
+	
+	for (int i = 0; i < agingCnt; i++) {
+		for (int lba = 0; lba <= maxLba; lba++) {
+			std::string cmd = R"(SSDProject W )" + std::to_string(lba) + " " + std::string(value1);
+			system(cmd.c_str());
+		}
+	}
+
+	for (int lba = 0; lba <= maxLba; lba++) {
+		std::string cmd = R"(SSDProject W )" + std::to_string(lba) + " " + std::string(value2);
+		system(cmd.c_str());
+	}
+
+	for (int lba = 0; lba <= maxLba; lba++) {
+		std::string cmd = R"(SSDProject R )" + std::to_string(lba);
+		system(cmd.c_str());
+		std::string retValue = readFromResultFile();
+		if (retValue == value2) {
+			std::cout << "TestApp2: Read compare after "
+				"write aging: Passed, LBA: " << lba
+				<< ", Expected: " << value2 << ", Actual: "
+				<< retValue << std::endl;
+		}
+		else {
+			std::cout << "TestApp2: Read compare after "
+				"write aging: Failed, LBA: " << lba
+				<< ", Expected: " << value2 << ", Actual: "
+				<< retValue << std::endl;
+		}
+	}
+	return true;
 }
 
 int main() {
