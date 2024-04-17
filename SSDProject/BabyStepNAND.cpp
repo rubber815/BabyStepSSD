@@ -4,22 +4,17 @@
 #include <fstream>
 #include <vector>
 
+#define NAND_FILE "nand.txt"
+#define NAND_DEFAULT_VALUE "0x00000000"
+#define NAND_LBA_COUNT 100
+
 class BabyStepNand : public INAND {
 public:
 	BabyStepNand() {
-		int len = 100;
+		for (int i = 0; i < NAND_LBA_COUNT; i++)
+			m_buffer.push_back(NAND_DEFAULT_VALUE);
 
-		std::ofstream writeToNand;
-		writeToNand.open("nand.txt");
-
-		for (int i = 0; i < len; i++) {
-			std::string tmp = "0x00000000";
-			if (i != len - 1) {
-				tmp += "\n";
-			}
-			writeToNand.write(tmp.c_str(), tmp.size());
-		}
-		writeToNand.close();
+		writeAllNand();
 	}
 
 	void write(int lba, std::string value) override;
@@ -30,7 +25,7 @@ private:
 
 	void readAllNand() {
 		std::ifstream readFromNand;
-		readFromNand.open("nand.txt");
+		readFromNand.open(NAND_FILE);
 
 		if (readFromNand.is_open()) {
 			m_buffer.clear();
@@ -47,7 +42,7 @@ private:
 
 	void writeAllNand() {
 		std::ofstream writeToNand;
-		writeToNand.open("nand.txt");
+		writeToNand.open(NAND_FILE);
 
 		int len = static_cast<int>(m_buffer.size());
 		for (int i = 0; i < len; i++) {
