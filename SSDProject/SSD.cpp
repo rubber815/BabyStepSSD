@@ -45,6 +45,12 @@ public:
 		/*RW op format verification*/
 		if (op == "fullwrite") {
 			iss >> val;
+			try {
+				checkValue(val);
+			}
+			catch(std::exception e) {
+				return false;
+			}
 			return true;
 		}
 		
@@ -65,7 +71,14 @@ public:
 			return true;
 		}
 
+		/*Test App format verification*/
+		if (op == "testapp1") {
+			// TODO: detail format check
+			return true;
+		}
+
 		if (op == "testapp2") {
+			// TODO: detail format check
 			return true;
 		}
 
@@ -90,6 +103,12 @@ private:
 		if (value.length() != VALUE_LENGTH
 			|| (value.substr(0, 2) != PREFIX_VALUE)) {
 			throw std::invalid_argument("value is incorrect");
+		}
+
+		for (int i = 2; i < value.length(); i++) {
+			if (value[i] < '0' || value[i] > '9' 
+				|| value[i] < 'A' || value[i] > 'F')
+				throw std::invalid_argument("value is incorrect");
 		}
 	}
 

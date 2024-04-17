@@ -30,13 +30,38 @@ bool mainRead() {
 	// TODO
 	return false;
 }
-bool mainFullWrite() {
-	// TODO
-	return false;
+bool mainFullWrite(SSD* babyStepSSD, std::string value) {
+	for (int i = 0; i < 100; i++)
+		babyStepSSD->write(i, value);
+
+	return true;
 }
-bool mainFullRead() {
-	// TODO
-	return false;
+bool mainFullRead(SSD* babyStepSSD) {
+	for (int i = 0; i < 100; i++)
+		std::cout << babyStepSSD->read(i) << std::endl;
+
+	return true;
+}
+
+bool mainTestApp1(SSD* ssd) {
+	/*	Full Write + ReadCompare
+	1. fullwrite
+	2. fullread + readcompare
+	*/
+	const std::string input1 = "0xABCDEFAB";
+	for (int lba = 0; lba < 100; lba++) {
+		ssd->write(lba, input1);
+
+		std::cout << "Write: " << lba << ", Value:" << input1 << std::endl;
+	}
+	for (int lba = 0; lba < 100; lba++) {
+		std::string ret = ssd->read(lba);
+		std::cout << "Read " << lba << ", Value:" << ret << std::endl;
+		if (ret != input1)
+			return false;
+	}
+
+	return true;
 }
 
 void mainTestApp2(SSD* ssd) {
@@ -132,18 +157,16 @@ int main() {
 		}
 		else if (operation == "fullwrite") {
 			iss >> value;
-			// TODO: mainFullWrite();
-
-			// TODO: will be removed
-			std::cout << "FullWrite successful." << std::endl;
-			std::cout << "[LBA]: 0 ~ 99 [Write Value]: 0x1111" << std::endl;
+			mainFullWrite(babyStepSSD, value);
 		}
 		else if (operation == "fullread") {
-			// TODO: mainFullRead();
-
+			mainFullRead(babyStepSSD);
+		}
+		else if (operation == "testapp1") {
+			// TODO: mainTestApp1();
 			// TODO: will be removed
-			std::cout << "FullRead successful." << std::endl;
-			std::cout << "[LBA]: 0 ~ 99 [Read Value]: 0x1111" << std::endl;
+			mainTestApp1(babyStepSSD);
+			std::cout << "TestApp1 successful." << std::endl;
 		}
 		else if (operation == "testapp2")
 			mainTestApp2(babyStepSSD);
