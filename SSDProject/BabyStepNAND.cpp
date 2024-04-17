@@ -11,10 +11,12 @@
 class BabyStepNand : public INAND {
 public:
 	BabyStepNand() {
-		for (int i = 0; i < NAND_LBA_COUNT; i++)
-			m_buffer.push_back(NAND_DEFAULT_VALUE);
+		if (readAllNand() == false) {
+			for (int i = 0; i < NAND_LBA_COUNT; i++)
+				m_buffer.push_back(NAND_DEFAULT_VALUE);
 
-		writeAllNand();
+			writeAllNand();
+		}
 	}
 
 	void write(int lba, std::string value) override {
@@ -38,7 +40,7 @@ public:
 private:
 	std::vector<std::string> m_buffer;
 
-	void readAllNand() {
+	bool readAllNand() {
 		std::ifstream readFromNand;
 		readFromNand.open(NAND_FILE);
 
@@ -51,8 +53,13 @@ private:
 				m_buffer.push_back(tmp);
 			}
 		}
+		else
+		{
+			return false;
+		}
 
 		readFromNand.close();
+		return true;
 	}
 
 	void writeAllNand() {
