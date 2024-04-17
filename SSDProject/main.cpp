@@ -5,39 +5,18 @@
 #include "SSD.cpp"
 #include "BabyStepNAND.cpp"
 
-SSD* initSSD() {
-    return new SSD();
-}
-
-bool mainWrite(SSD* ssd, int lba, std::string value) {
-    ssd->write(lba, value);
-
-    return true;
-}
-bool mainRead(SSD* ssd, int lba) {
-    std::string readData = ssd->read(lba);
-
-    return true;
-}
-
 int main(int argc, char* argv[]) {
     std::string cmd = argv[1];
 
-    SSD* babyStepSSD = initSSD();
-    BabyStepNand* babyStepNand = new BabyStepNand();
-    babyStepSSD->selectNAND(babyStepNand);
+    SSD babyStepSSD;
+    BabyStepNand babyStepNand;
+    babyStepSSD.selectNAND(&babyStepNand);
 
-    if (cmd == "R") {
-        std::string lba = argv[2];
-        mainRead(babyStepSSD, stoi(lba));
-    }
-    if (cmd == "W") {
-        std::string lba = argv[2];
-        mainWrite(babyStepSSD, stoi(lba), argv[3]);
-    }
+    if (cmd == "R")
+        babyStepSSD.read(atoi(argv[2]));
 
-    delete babyStepNand;
-    delete babyStepSSD;
+    if (cmd == "W")
+        babyStepSSD.write(atoi(argv[2]), argv[3]);
 
     return 0;
 }

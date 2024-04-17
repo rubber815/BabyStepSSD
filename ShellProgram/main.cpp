@@ -6,16 +6,44 @@
 #include <cstdlib> // For system() function
 
 bool verifyCommandFormat(const std::string& command) {
-	// TODO
-	return true;
-}
+	std::string operation;
+	std::istringstream iss(command);
+	iss >> operation;
+	if (operation == "write" ||
+		operation == "read" ||
+		operation == "exit" ||
+		operation == "help" ||
+		operation == "fullwrite" ||
+		operation == "fullread") {
+		return true;
+	}
 
-bool help() {
-	// TODO
+	std::cout << "INVALID COMMAND" << std::endl;
 	return false;
 }
+
+void help() {
+	std::cout << std::endl;
+	std::cout << "************************************" << std::endl;
+	std::cout << "* [ShellProgram commands help]" << std::endl;
+	std::cout << "* exit: terminate shell" << std::endl;
+	std::cout << "* help: print the usage for each command" << std::endl;
+	std::cout << "* write: write to SSD" << std::endl;
+	std::cout << "*		format: write <LBA> <VALUE>" << std::endl;
+	std::cout << "* read: read from SSD" << std::endl;
+	std::cout << "*		format: read <LBA>" << std::endl;
+	std::cout << "* fullwrite: write from LBA numbers 0 to 99." << std::endl;
+	std::cout << "*		format: fullwrite <VALUE>" << std::endl;
+	std::cout << "* fullread: read from LBA numbers 0 to 99." << std::endl;
+	std::cout << "*		format: fullread" << std::endl;
+	std::cout << "*----------------------------------" << std::endl;
+	std::cout << "* LBA: 0 ~ 99                      " << std::endl;
+	std::cout << "* VALUE: 0x00000000 ~ 0xFFFFFFFF   " << std::endl;
+	std::cout << "***********************************" << std::endl;
+	std::cout << std::endl;
+}
 bool exit() {
-	// TODO
+	std::cout << "Exiting the program..." << std::endl;
 	return false;
 }
 
@@ -40,10 +68,46 @@ bool fullRead() {
 	return false;
 }
 
+std::string readFromResultFile() {
+	const std::string RESULT_FILE_NAME = "result.txt";
+	std::ifstream inputFile(RESULT_FILE_NAME);
+	std::string value;
+
+	if (!inputFile.is_open()) {
+		std::cout << "Failed to open file for reading." << std::endl;
+		return value;
+	}
+	std::getline(inputFile, value);
+
+	inputFile.close();
+	return value;
+
+}
+
 bool testApp1() {
-	// TODO
-	//system("");
-	return false;
+	/*	Full Write + ReadCompare
+	1. fullwrite
+	2. fullread + readcompare
+	*/
+	const std::string input1 = "0xABCDEFAB";
+	for (int lba = 0; lba < 100; lba++) {
+		std::string cmd = "SSDProject W ";
+		cmd += std::to_string(lba);
+		cmd += " " + input1;
+		system(cmd.c_str());
+	}
+	for (int lba = 0; lba < 100; lba++) {
+		std::string cmd = "SSDProject R ";
+		cmd += std::to_string(lba);
+		system(cmd.c_str());
+
+		// Compare
+		std::string read_val = readFromResultFile();
+		if (read_val != input1)
+			return false;
+	}
+
+	return true;
 }
 
 std::string readFromResultFile() {
@@ -107,36 +171,27 @@ bool testApp2() {
 
 int main() {
 	std::string command, operation, lba, value;
-	
+	std::string cmd = "SSDProject ";
+
 	while (true) {
 		std::cout << "Welcome to ShellProgram!!: "; // Updated prompt
 		std::getline(std::cin, command);
 
-		if (!(verifyCommandFormat(command))) {
-			std::cout << "FATAL: INVALID_FORMAT!" << std::endl;
+		if (!(verifyCommandFormat(command)))
 			continue;
-		}
 
 		// parsing commands
 		std::istringstream iss(command);
 		iss >> operation;
 
+		// Shell commands
 		if (operation == "exit") {
 			exit();
-			std::cout << "Exiting the program." << std::endl;
 			break;
 		}
 
 		if (operation == "help") {
-			std::cout << std::endl;
-			std::cout << "[BabyStepNand commands help]" << std::endl;
-			std::cout << "- exit: terminate shell" << std::endl;
-			std::cout << "- help: print the usage for each command" << std::endl;
-			std::cout << "- write: write to SSD" << std::endl;
-			std::cout << "- read: read from SSD" << std::endl;
-			std::cout << "- fullwrite: write from LBA numbers 0 to 99." << std::endl;
-			std::cout << "- fullread: read from LBA numbers 0 to 99." << std::endl;
-			std::cout << std::endl;
+			help();
 			continue;
 		}
 
@@ -157,8 +212,12 @@ int main() {
 		else if (operation == "fullread") {
 			fullRead();
 		}
+		/*TestApp commands*/
 		else if (operation == "testapp1") {
-			testApp1();
+			if (testApp1())
+				std::cout << "testapp1: Compare Success!" << std::endl;
+			else
+				std::cout << "testapp1: Compare Fail!" << std::endl;
 		}
 		else if (operation == "testapp2")
 			testApp2();
