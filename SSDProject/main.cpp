@@ -43,6 +43,27 @@ bool mainFullRead(SSD* babyStepSSD) {
 	return true;
 }
 
+bool mainTestApp1(SSD* ssd) {
+	/*	Full Write + ReadCompare
+	1. fullwrite
+	2. fullread + readcompare
+	*/
+	const std::string input1 = "0xABCDEFAB";
+	for (int lba = 0; lba < 100; lba++) {
+		ssd->write(lba, input1);
+
+		std::cout << "Write: " << lba << ", Value:" << input1 << std::endl;
+	}
+	for (int lba = 0; lba < 100; lba++) {
+		std::string ret = ssd->read(lba);
+		std::cout << "Read " << lba << ", Value:" << ret << std::endl;
+		if (ret != input1)
+			return false;
+	}
+
+	return true;
+}
+
 int main() {
 	//FAKE_SSD ssd;
 	std::string command, operation, lba, value;
@@ -110,6 +131,12 @@ int main() {
 		}
 		else if (operation == "fullread") {
 			mainFullRead(babyStepSSD);
+		}
+		else if (operation == "testapp1") {
+			// TODO: mainTestApp1();
+			// TODO: will be removed
+			mainTestApp1(babyStepSSD);
+			std::cout << "TestApp1 successful." << std::endl;
 		}
 	}
 

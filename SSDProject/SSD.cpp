@@ -71,6 +71,12 @@ public:
 			return true;
 		}
 
+		/*Test App format verification*/
+		if (op == "testapp1") {
+			// TODO: detail format check
+			return true;
+		}
+
 		/*RW op formant not verified!!!*/
 		return false;
 	}
