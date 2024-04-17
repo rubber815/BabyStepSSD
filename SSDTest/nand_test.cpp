@@ -12,6 +12,9 @@ class SSDTestWithBabyStepNand : public testing::Test {
 protected:
 	void SetUp() override {
 		ssd_.selectNAND(&b_nand_);
+
+		for (int i = 0; i < 100; i++)
+			b_nand_.write(i, "0x00000000");
 	}
 public:
 	SSD ssd_;
@@ -88,7 +91,7 @@ TEST_F(SSDTestWithBabyStepNand, Write_Read_test_normal_success) {
 	EXPECT_EQ("0x0000AAAA", ssd_.read(30));
 }
 
-TEST_F(SSDTestWithBabyStepNand, DISABLED_Write_Read_test_not_written_lba) {
+TEST_F(SSDTestWithBabyStepNand, Write_Read_test_not_written_lba) {
 	ssd_.write(0, "0xAAAABBBB");
 	EXPECT_EQ("0xAAAABBBB", ssd_.read(0));
 
