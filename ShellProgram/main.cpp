@@ -50,7 +50,6 @@ bool exit() {
 bool write(std::string lba, std::string value) {
 	std::string str = "SSDProject ";
 	str = str + "W " + lba + " " + value;
-	std::cout << str << std::endl;
 
 	system(str.c_str());
 	return true;
@@ -58,7 +57,6 @@ bool write(std::string lba, std::string value) {
 bool read(std::string lba) {
 	std::string str = "SSDProject ";
 	str = str + "R " + lba;
-	std::cout << str << std::endl;
 
 	system(str.c_str());
 	return true;
