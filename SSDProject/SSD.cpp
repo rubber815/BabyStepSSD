@@ -45,6 +45,12 @@ public:
 		/*RW op format verification*/
 		if (op == "fullwrite") {
 			iss >> val;
+			try {
+				checkValue(val);
+			}
+			catch(std::exception e) {
+				return false;
+			}
 			return true;
 		}
 		
