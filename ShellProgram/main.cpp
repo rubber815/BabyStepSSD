@@ -40,10 +40,46 @@ bool fullRead() {
 	return false;
 }
 
+std::string readFromResultFile() {
+	const std::string RESULT_FILE_NAME = "result.txt";
+	std::ifstream inputFile(RESULT_FILE_NAME);
+	std::string value;
+
+	if (!inputFile.is_open()) {
+		std::cout << "Failed to open file for reading." << std::endl;
+		return value;
+	}
+	std::getline(inputFile, value);
+
+	inputFile.close();
+	return value;
+
+}
+
 bool testApp1() {
-	// TODO
-	//system("");
-	return false;
+	/*	Full Write + ReadCompare
+	1. fullwrite
+	2. fullread + readcompare
+	*/
+	const std::string input1 = "0xABCDEFAB";
+	for (int lba = 0; lba < 100; lba++) {
+		std::string cmd = "SSDProject W ";
+		cmd += std::to_string(lba);
+		cmd += " " + input1;
+		system(cmd.c_str());
+	}
+	for (int lba = 0; lba < 100; lba++) {
+		std::string cmd = "SSDProject R ";
+		cmd += std::to_string(lba);
+		system(cmd.c_str());
+
+		// Compare
+		std::string read_val = readFromResultFile();
+		if (read_val != input1)
+			return false;
+	}
+
+	return true;
 }
 
 bool testApp2() {
@@ -54,6 +90,7 @@ bool testApp2() {
 
 int main() {
 	std::string command, operation, lba, value;
+	std::string cmd = "SSDProject ";
 
 	while (true) {
 		std::cout << "Welcome to ShellProgram!!: "; // Updated prompt
@@ -105,7 +142,10 @@ int main() {
 			fullRead();
 		}
 		else if (operation == "testapp1") {
-			testApp1();
+			if (testApp1())
+				std::cout << "testapp1: Compare Success!" << std::endl;
+			else
+				std::cout << "testapp1: Compare Fail!" << std::endl;
 		}
 		else if (operation == "testapp2")
 			testApp2();
