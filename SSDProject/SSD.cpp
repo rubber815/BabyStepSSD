@@ -62,13 +62,34 @@ public:
 
 		if (op == "write") {
 			iss >> lba >> val;
-			// TODO: detail format check
+
+			try {
+				checkLbaRange(stoi(lba));
+			}
+			catch (std::exception e) {
+				return false;
+			}
+
+			try {
+				checkValue(val);
+			}
+			catch (std::exception e) {
+				return false;
+			}
+
 			return true;
 		}
 		
 		if (op == "read") {
-			// TODO: detail format check
 			iss >> lba;
+
+			try {
+				checkLbaRange(stoi(lba));
+			}
+			catch (std::exception e) {
+				return false;
+			}
+
 			return true;
 		}
 
