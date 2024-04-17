@@ -28,31 +28,40 @@ public:
 	// TODO
 	bool verifyCommandFormat(const std::string& command) {
 		std::istringstream iss(command);
-		std::string op;
-		int lba;
+		std::string op, lba, val;
+
+		iss >> op;
 
 		/*exit: terminate shell*/
-		if (command == "exit") {
+		if (op == "exit") {
 			return true;
 		}
 
 		/*help: print the usage for each command.*/
-		if (command == "help") {
+		if (op == "help") {
 			return true;
 		}
 
 		/*RW op format verification*/
-		if (command == "fullwrite" || command == "fullread") {
+		if (op == "fullwrite") {
+			iss >> val;
+			return true;
+		}
+		
+		if(op == "fullread") {
 			// TODO: detail format check
 			return true;
 		}
 
-		if (!(iss >> op >> lba)) {
-			return false;
-		}
-		if (op == "write" || op == "read") {
-
+		if (op == "write") {
+			iss >> lba >> val;
 			// TODO: detail format check
+			return true;
+		}
+		
+		if (op == "read") {
+			// TODO: detail format check
+			iss >> lba;
 			return true;
 		}
 
