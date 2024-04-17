@@ -27,7 +27,7 @@ public:
 			checkLbaRange(lba);
 		}
 		catch (std::exception e) {
-			return;
+			return nullptr;
 		}
 
 		std::string value = nand_->read(lba);
