@@ -29,6 +29,41 @@ TEST_F(SSDTestWithBabyStepNand, Write_lba_test_with_BabyStep) {
 	EXPECT_EQ("0x00000003",ssd_.read(0x4));
 }
 
+TEST_F(SSDTestWithBabyStepNand, Full_Read_test_with_BabyStep_Normal_Success) {
+	const std::string input = "0xABCDEFAB";
+	for (int lba = 0; lba < 100; lba++) {
+		ssd_.write(lba, input);
+	}
+
+	for (int lba = 0; lba < 100; lba++) {
+		std::string ret = ssd_.read(lba);
+		EXPECT_EQ(ret, input);
+	}
+}
+	
+
+TEST_F(SSDTestWithBabyStepNand, Full_Read_test_with_BabyStep_Normal_Fail) {
+	const std::string input1 = "0xABCDEFAB";
+	for (int lba = 0; lba < 50; lba++) {
+		ssd_.write(lba, input1);
+	}
+
+	const std::string input2 = "0xABCDAAAA";
+	for (int lba = 50; lba < 100; lba++) {
+		ssd_.write(lba, input2);
+	}
+
+	for (int lba = 0; lba < 50; lba++) {
+		std::string ret = ssd_.read(lba);
+		EXPECT_EQ(ret, input1);
+	}
+
+	for (int lba = 50; lba < 100; lba++) {
+		std::string ret = ssd_.read(lba);
+		EXPECT_NE(ret, input1);
+	}
+}
+
 TEST_F(SSDTestWithBabyStepNand, Write_lba_test_with_BabyStep) {
 	ssd_.write(99, "0x00000003");
 	EXPECT_EQ("0x00000003",ssd_.read(99));
@@ -103,6 +138,3 @@ TEST_F(SSDTestWithBabyStepNand, fullWrite_twice_success_test_with_BabyStep) {
 	for (int i = 0; i < 100; i++)
 		EXPECT_EQ("0x99999999", ssd_.read(i));
 }
-
-
-// TODO
