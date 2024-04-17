@@ -57,14 +57,23 @@ bool read() {
 	//system("");
 	return false;
 }
-bool fullWrite() {
-	// TODO
-	//system("");
+bool fullWrite(std::string value) {
+	for (int i = 0; i < 100; i++) {
+		std::string str = R"(SSDProject W )" + std::to_string(i) + " " + value;
+		system(str.c_str());
+	}
+
 	return false;
 }
+
 bool fullRead() {
 	// TODO
 	//system("");
+	for (int i = 0; i < 100; i++) {
+		std::string str = R"(SSDProject R )" + std::to_string(i);
+		system(str.c_str());
+		std::cout << readFromResultFile() << std::endl;
+	}
 	return false;
 }
 
@@ -206,8 +215,8 @@ int main() {
 			read();
 		}
 		else if (operation == "fullwrite") {
-			iss >> value;
-			fullWrite();
+			iss >> value;	
+			fullWrite(value);
 		}
 		else if (operation == "fullread") {
 			fullRead();
