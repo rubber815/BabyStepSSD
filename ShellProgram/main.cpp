@@ -66,17 +66,6 @@ bool fullWrite(std::string value) {
 	return false;
 }
 
-bool fullRead() {
-	// TODO
-	//system("");
-	for (int i = 0; i < 100; i++) {
-		std::string str = R"(SSDProject R )" + std::to_string(i);
-		system(str.c_str());
-		std::cout << readFromResultFile() << std::endl;
-	}
-	return false;
-}
-
 std::string readFromResultFile() {
 	const std::string RESULT_FILE_NAME = "result.txt";
 	std::ifstream inputFile(RESULT_FILE_NAME);
@@ -91,6 +80,17 @@ std::string readFromResultFile() {
 	inputFile.close();
 	return value;
 
+}
+
+bool fullRead() {
+	// TODO
+	//system("");
+	for (int i = 0; i < 100; i++) {
+		std::string str = R"(SSDProject R )" + std::to_string(i);
+		system(str.c_str());
+		std::cout << readFromResultFile() << std::endl;
+	}
+	return false;
 }
 
 bool testApp1() {
@@ -119,21 +119,6 @@ bool testApp1() {
 	return true;
 }
 
-std::string readFromResultFile() {
-	const std::string RESULT_FILE_NAME = "result.txt";
-	std::ifstream inputFile(RESULT_FILE_NAME);
-	std::string value;
-
-	if (!inputFile.is_open()) {
-		std::cout << "Failed to open file for reading." << std::endl;
-		return value;
-	}
-	std::getline(inputFile, value);
-
-	inputFile.close();
-	return value;
-
-}
 bool testApp2() {
 	const int agingCnt = 30;
 	const int maxLba = 5;
