@@ -30,13 +30,17 @@ bool mainRead() {
 	// TODO
 	return false;
 }
-bool mainFullWrite() {
-	// TODO
-	return false;
+bool mainFullWrite(SSD* babyStepSSD, std::string value) {
+	for (int i = 0; i < 100; i++)
+		babyStepSSD->write(i, value);
+
+	return true;
 }
-bool mainFullRead() {
-	// TODO
-	return false;
+bool mainFullRead(SSD* babyStepSSD) {
+	for (int i = 0; i < 100; i++)
+		std::cout << babyStepSSD->read(i) << std::endl;
+
+	return true;
 }
 
 int main() {
@@ -102,18 +106,10 @@ int main() {
 		}
 		else if (operation == "fullwrite") {
 			iss >> value;
-			// TODO: mainFullWrite();
-
-			// TODO: will be removed
-			std::cout << "FullWrite successful." << std::endl;
-			std::cout << "[LBA]: 0 ~ 99 [Write Value]: 0x1111" << std::endl;
+			mainFullWrite(babyStepSSD, value);
 		}
 		else if (operation == "fullread") {
-			// TODO: mainFullRead();
-
-			// TODO: will be removed
-			std::cout << "FullRead successful." << std::endl;
-			std::cout << "[LBA]: 0 ~ 99 [Read Value]: 0x1111" << std::endl;
+			mainFullRead(babyStepSSD);
 		}
 	}
 
