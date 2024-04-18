@@ -34,6 +34,18 @@ public:
 		writeToResultFile(value);
 		return value;
 	}
+	void erase(int lba, int size) {
+		try {
+			checkLbaRange(lba);
+		}
+		catch (std::exception e) {
+			return;
+		}
+		// need to change range
+
+		nand_->erase(lba, size);
+		std::cout << lba << " " << size << std::endl;
+	}
 
 	// TODO
 	bool verifyCommandFormat(const std::string& command) {

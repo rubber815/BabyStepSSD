@@ -18,5 +18,8 @@ int main(int argc, char* argv[]) {
     if (cmd == "W")
         babyStepSSD.write(atoi(argv[2]), argv[3]);
 
+    if (cmd == "E")
+        babyStepSSD.erase(atoi(argv[2]), atoi(argv[3]));
+
     return 0;
 }
