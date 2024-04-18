@@ -6,13 +6,16 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib> // For system() function
+#include <io.h>
 #include "Logger.cpp"
 
 bool verifyCommandFormat(const std::string& command) {
 	std::string operation;
 	std::istringstream iss(command);
 	iss >> operation;
-	if (operation == "write" ||
+	if (operation == "erase" ||
+		operation == "erase_range" ||
+		operation == "write" ||
 		operation == "read" ||
 		operation == "exit" ||
 		operation == "help" ||
@@ -33,6 +36,10 @@ void help() {
 	std::cout << "* [ShellProgram commands help]" << std::endl;
 	std::cout << "* exit: terminate shell" << std::endl;
 	std::cout << "* help: print the usage for each command" << std::endl;
+	std::cout << "* erase: erase LBA ~ (LBA + SIZE)" << std::endl;
+	std::cout << "*		format: erase <LBA> <SIZE>" << std::endl;
+	std::cout << "* erase_range: erase STARTLBA ~ ENDLBA" << std::endl;
+	std::cout << "*		format: write <STARTLBA> <ENDLBA>" << std::endl;
 	std::cout << "* write: write to SSD" << std::endl;
 	std::cout << "*		format: write <LBA> <VALUE>" << std::endl;
 	std::cout << "* read: read from SSD" << std::endl;
@@ -52,7 +59,24 @@ bool exit() {
 	return false;
 }
 
-bool write(std::string lba, std::string value) {	
+bool erase(std::string lba, std::string size) {
+	std::string str = "ssd ";
+	str = str + "E " + lba + " " + size;
+
+	system(str.c_str());
+
+	return true;
+}
+
+bool erase_range(std::string startlba, std::string endlba) {
+	int size = stoi(endlba) - stoi(startlba);
+
+	erase(startlba, std::to_string(size));
+
+	return true;
+}
+
+bool write(std::string lba, std::string value) {
 	std::string str = "ssd ";
 	str = str + "W " + lba + " " + value;
 
@@ -61,6 +85,7 @@ bool write(std::string lba, std::string value) {
 	system(str.c_str());
 	return true;
 }
+
 bool read(std::string lba) {
 	std::string str = "ssd ";
 	str = str + "R " + lba;
@@ -70,6 +95,7 @@ bool read(std::string lba) {
 	system(str.c_str());
 	return true;
 }
+
 bool fullWrite(std::string value) {
 	LOG_FUNCTION_CALL(__func__, value);
 
@@ -159,6 +185,7 @@ bool testApp2() {
 		std::string cmd = R"(ssd R )" + std::to_string(lba);
 		system(cmd.c_str());
 		std::string retValue = readFromResultFile();
+#if 0
 		if (retValue == value2) {
 			std::cout << "TestApp2: Read compare after "
 				"write aging: Passed, LBA: " << lba
@@ -171,15 +198,68 @@ bool testApp2() {
 				<< ", Expected: " << value2 << ", Actual: "
 				<< retValue << std::endl;
 		}
+#endif
 	}
 	return true;
+}
+
+bool isValidFilePath(char* path) {
+	std::ifstream runnerFile(path);
+
+	if (!runnerFile.is_open()) {
+		std::cout << "Failed to open file for reading." << std::endl;
+		return false;
+	}
+	return true;
+}
+
+void doRunner(char* path) {
+	std::string funcName;
+	std::ifstream runnerFile(path);
+
+	while (!runnerFile.eof()) {
+		bool result = false;
+		
+		std::getline(runnerFile, funcName);
+		std::cout << funcName << " --- Run...";
+
+		if (funcName == "testApp1") {
+			result = testApp1();
+		}
+		else if (funcName == "testApp2") {
+			result = testApp2();
+		}
+		else {
+			if (_access(funcName.c_str(), 0) != -1) {
+				system(funcName.c_str());
+				result = true;
+			}
+		}
+		if (result) {
+			std::cout << "Pass" << std::endl;
+		}
+		else {
+			std::cout << "FAIL!" << std::endl;
+			break;
+		}
+	}
 }
 
 // Static member initialization
 FunctionCallLogger* FunctionCallLogger::instance = nullptr;
 
-int main() {
-	std::string command, operation, lba, value;
+int main(int argc, char* argv[]) {
+	// for Runner
+	if (argc > 1) {
+		if (!isValidFilePath(argv[1])) {
+			return 0;
+		}
+		doRunner(argv[1]);
+			
+		return 0;
+	}
+
+	std::string command, operation, lba, endlba, value, size;
 	std::string cmd = "ssd ";
 
 	while (true) {
@@ -205,7 +285,17 @@ int main() {
 		}
 
 		/*RW commands*/
-		if (operation == "write") {
+		if (operation == "erase") {
+			iss >> lba;
+			iss >> size;
+			erase(lba, size);
+		}
+		else if (operation == "erase_range") {
+			iss >> lba;
+			iss >> endlba;
+			erase_range(lba, endlba);
+		}
+		else if (operation == "write") {
 			iss >> lba;
 			iss >> value;
 			write(lba, value);

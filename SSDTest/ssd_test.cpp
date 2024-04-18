@@ -10,6 +10,7 @@ using namespace testing;
 
 class MockNAND : public INAND {
 public:
+	MOCK_METHOD(void, erase, (int, int), (override));
 	MOCK_METHOD(void, write, (int, std::string), (override));
 	MOCK_METHOD(std::string, read, (int), (override));
 };
