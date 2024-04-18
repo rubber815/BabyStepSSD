@@ -47,15 +47,19 @@ bool exit() {
 	return false;
 }
 
-bool write() {
-	// TODO
-	//system("");
-	return false;
+bool write(std::string lba, std::string value) {
+	std::string str = "SSDProject ";
+	str = str + "W " + lba + " " + value;
+
+	system(str.c_str());
+	return true;
 }
-bool read() {
-	// TODO
-	//system("");
-	return false;
+bool read(std::string lba) {
+	std::string str = "SSDProject ";
+	str = str + "R " + lba;
+
+	system(str.c_str());
+	return true;
 }
 bool fullWrite(std::string value) {
 	for (int i = 0; i < 100; i++) {
@@ -193,11 +197,11 @@ int main() {
 		if (operation == "write") {
 			iss >> lba;
 			iss >> value;
-			write();
+			write(lba, value);
 		}
 		else if (operation == "read") {
 			iss >> lba;
-			read();
+			read(lba);
 		}
 		else if (operation == "fullwrite") {
 			iss >> value;	
