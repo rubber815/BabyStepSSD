@@ -208,7 +208,7 @@ void doRunner(char* path) {
 	std::ifstream runnerFile(path);
 
 	while (!runnerFile.eof()) {
-		bool result = false;;
+		bool result = false;
 		
 		std::getline(runnerFile, funcName);
 		std::cout << funcName << " --- Run...";
