@@ -216,7 +216,7 @@ void doRunner(char* path) {
 }
 
 // Static member initialization
-FunctionCallLogger* FunctionCallLogger::instance = nullptr;
+Logger* Logger::instance = nullptr;
 
 int main(int argc, char* argv[]) {
 	// for Runner
