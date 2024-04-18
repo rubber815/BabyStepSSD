@@ -5,6 +5,7 @@
 #include <sstream>
 #include "../SSDProject/INAND.cpp"
 #include <stdexcept>
+#include <vector>
 
 class SSD {
 public:
@@ -46,6 +47,110 @@ public:
 
 		nand_->erase(lba, size);
 		std::cout << lba << " " << size << std::endl;
+	}
+	bool updateWriteBuffer(char* argv[]) {
+		std::string cmd = argv[1];
+		searchWriteBuffer(argv);
+		if (cmd == "R") {
+
+			//if (getdata() == true)
+				//writeToResultFile(value);
+				return true;
+		}
+		else if (cmd == "W") {
+
+		}
+		else if (cmd == "E") {
+
+		}
+		//flush
+		return true;
+		//return false;
+	}
+	void flushWriteBuffer(void) {
+
+	}
+	void searchWriteBuffer(char* argv[]) {
+		std::vector<std::string> v;
+		int count;
+
+		std::ifstream readFromWriteBuffer;
+		readFromWriteBuffer.open(WRITE_BUFFER_FILE_NAME);
+
+		if (readFromWriteBuffer.is_open()) {
+			std::string tmp;
+			std::string input_str;
+			getline(readFromWriteBuffer, tmp);
+			count = stoi(tmp);
+			std::cout << count << std::endl;
+			for (int i = 0; i < count; i++) {
+				getline(readFromWriteBuffer, tmp);
+
+				int lba = tmp[2] - '0';
+
+				if (tmp[0] == 'W') {
+					//if (argv[1] == "W") {
+						if (lba == atoi(argv[2])) {
+							//std::cout << tmp << std::endl;
+						}
+						else {
+							std::cout << tmp << std::endl;
+							v.push_back(tmp);
+						}
+					//}
+					/*else if (argv[1] == "E") {
+						if ((atoi(argv[2]) <= lba) && ((atoi(argv[2]) + atoi(argv[3])) > lba)) {
+
+						}
+						else {
+							v.push_back(tmp);
+						}
+					}*/
+				}
+				else if (tmp[0] == 'E') {
+					if (argv[1] == "W") {
+						//To-Do
+					}
+					else if (argv[1] == "E") {
+						//To-Do
+					}
+					v.push_back(tmp);
+				}
+			}
+
+			input_str = argv[1];
+			input_str = input_str + " ";
+			input_str = input_str + argv[2];
+			input_str = input_str + " ";
+			input_str = input_str + argv[3];
+
+			v.push_back(input_str);
+
+			readFromWriteBuffer.close();
+		}
+		else
+			return;
+
+		count = v.size();
+
+		std::ofstream outputFile(WRITE_BUFFER_FILE_NAME);
+		if (!outputFile) {
+			std::cout << "Failed to open file for writing." << std::endl;
+		}
+		else {
+			if (v.size() == 10) {
+				//flush()
+				//v.clear();
+			}
+			outputFile << count << std::endl;
+			for (int i = 0; i < count; i++) {
+				outputFile << v[i] << std::endl;
+				std::cout << v[i] << std::endl;
+			}
+			outputFile.close();
+		}
+
+		return;
 	}
 
 	// TODO
@@ -161,6 +266,7 @@ private:
 	const int VALUE_LENGTH = 10;
 	const std::string PREFIX_VALUE = "0x";
 	const std::string RESULT_FILE_NAME = "result.txt";
+	const std::string WRITE_BUFFER_FILE_NAME = "writebuffer.txt";
 
 	void checkLbaRange(int lba) {
 		if (lba < MIN_LBA || lba > MAX_LBA)
