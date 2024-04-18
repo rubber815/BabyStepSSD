@@ -48,14 +48,14 @@ bool exit() {
 }
 
 bool write(std::string lba, std::string value) {
-	std::string str = "SSDProject ";
+	std::string str = "ssd ";
 	str = str + "W " + lba + " " + value;
 
 	system(str.c_str());
 	return true;
 }
 bool read(std::string lba) {
-	std::string str = "SSDProject ";
+	std::string str = "ssd ";
 	str = str + "R " + lba;
 
 	system(str.c_str());
