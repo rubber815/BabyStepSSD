@@ -23,8 +23,9 @@ private:
 
 	static Logger* instance;
 	int count = 0; // 
-
-	std::string theOldestFileName = "INVALID_FILE_NAME";
+	
+	std::ostringstream logFile;
+	std::ostringstream compessionCandidateFile;
 
 	Logger() {
 		openNewLogFile();
@@ -50,20 +51,28 @@ private:
 	// Logger feature 2: Log recording rules
 	/*from latest.log to until_date_time.log*/
 	void recordLog(const std::tm& timeinfo) {
-		std::ostringstream newFilename;
-		newFilename << "until_" << std::put_time(&timeinfo, "%y%m%d_%Hh_%Mm_%Ss") << ".log";
-		//std::cout << "[Logger]: " << newFilename.str() << " is created!" << std::endl; // TODO : will be removed
+		if (compessionCandidateFile.str() != "") {
+			compressLog();
+		}
+		logFile.clear();
+		logFile.str("");
+		//std::cout << "[Logger]: " << logFile.str() << " is created!" << std::endl;
+		logFile << "until_" << std::put_time(&timeinfo, "%y%m%d_%Hh_%Mm_%Ss") << ".log";
+		compessionCandidateFile << "until_" << std::put_time(&timeinfo, "%y%m%d_%Hh_%Mm_%Ss") << ".zip";
+		//std::cout << "[Logger]: " << recordFile.str() << " is created!" << std::endl; // TODO : will be removed
 		closeLogFile();
 
-		std::rename(LATEST_LOG_FILENAME.c_str(), newFilename.str().c_str()); // date log created!!
+		std::rename(LATEST_LOG_FILENAME.c_str(), logFile.str().c_str()); // date log created!!
 
 		openNewLogFile();
 	}
 
 	// Logger feature 2: Log compression rules
 	/*from .log to .zip */
-	void compressLog(const std::tm& timeinfo) {
-		// TODO:
+	void compressLog() {
+		std::rename(logFile.str().c_str(), compessionCandidateFile.str().c_str());
+		compessionCandidateFile.clear();
+		compessionCandidateFile.str("");
 	}
 
 public:
@@ -102,7 +111,7 @@ public:
 
 			//std::cout << "Size: " << latestLogFile.tellp() << std::endl;
 			// 10 KB = 10240 Bytes (in binary)
-			if (latestLogFile.tellp() > 10240) {
+			if (latestLogFile.tellp() > 1) {
 				recordLog(currentTimeInfo);
 			}
 
