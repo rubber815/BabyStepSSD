@@ -37,11 +37,12 @@ public:
 	void erase(int lba, int size) {
 		try {
 			checkLbaRange(lba);
+			checkLbaRange(lba + size - 1);
+			checkEraseSize(size);
 		}
 		catch (std::exception e) {
 			return;
 		}
-		// need to change range
 
 		nand_->erase(lba, size);
 		std::cout << lba << " " << size << std::endl;
@@ -50,7 +51,7 @@ public:
 	// TODO
 	bool verifyCommandFormat(const std::string& command) {
 		std::istringstream iss(command);
-		std::string op, lba, val;
+		std::string op, lba, endlba, val, size;
 
 		iss >> op;
 
@@ -87,18 +88,11 @@ public:
 
 			try {
 				checkLbaRange(stoi(lba));
-			}
-			catch (std::exception e) {
-				return false;
-			}
-
-			try {
 				checkValue(val);
 			}
 			catch (std::exception e) {
 				return false;
 			}
-
 			return true;
 		}
 		
@@ -112,6 +106,36 @@ public:
 				return false;
 			}
 
+			return true;
+		}
+
+		if (op == "erase") {
+			iss >> lba;
+			iss >> size;
+
+			try {
+				checkLbaRange(stoi(lba));
+				checkLbaRange(stoi(lba) + stoi(size) - 1);
+				checkEraseSize(stoi(size));
+			}
+			catch (std::exception e) {
+				return false;
+			}
+			return true;
+		}
+
+		if (op == "erase_range") {
+			iss >> lba;
+			iss >> endlba;
+
+			try {
+				checkLbaRange(stoi(lba));
+				checkLbaRange(stoi(endlba) - 1);
+				checkEraseSize(stoi(endlba) - stoi(lba));
+			}
+			catch (std::exception e) {
+				return false;
+			}
 			return true;
 		}
 
@@ -141,6 +165,11 @@ private:
 	void checkLbaRange(int lba) {
 		if (lba < MIN_LBA || lba > MAX_LBA)
 			throw std::invalid_argument("lba is incorrect");
+	}
+
+	void checkEraseSize(int size) {
+		if (size > 10)
+			throw std::invalid_argument("over size");
 	}
 
 	void checkValue(std::string value) {
