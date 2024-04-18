@@ -9,7 +9,9 @@ bool verifyCommandFormat(const std::string& command) {
 	std::string operation;
 	std::istringstream iss(command);
 	iss >> operation;
-	if (operation == "write" ||
+	if (operation == "erase" ||
+		operation == "erase_range" ||
+		operation == "write" ||
 		operation == "read" ||
 		operation == "exit" ||
 		operation == "help" ||
@@ -49,6 +51,21 @@ bool exit() {
 	return false;
 }
 
+bool erase(std::string lba, std::string size) {
+	std::string str = "ssd ";
+	str = str + "E " + lba + " " + size;
+
+	system(str.c_str());
+
+	return true;
+}
+bool erase_range(std::string startlba, std::string endlba) {
+	int size = stoi(endlba) - stoi(startlba);
+
+	erase(startlba, std::to_string(size));
+
+	return true;
+}
 bool write(std::string lba, std::string value) {
 	std::string str = "ssd ";
 	str = str + "W " + lba + " " + value;
@@ -202,7 +219,7 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 
-	std::string command, operation, lba, value;
+	std::string command, operation, lba, endlba, value, size;
 	std::string cmd = "ssd ";
 
 	while (true) {
@@ -228,7 +245,17 @@ int main(int argc, char* argv[]) {
 		}
 
 		/*RW commands*/
-		if (operation == "write") {
+		if (operation == "erase") {
+			iss >> lba;
+			iss >> size;
+			erase(lba, size);
+		}
+		else if (operation == "erase_range") {
+			iss >> lba;
+			iss >> endlba;
+			erase_range(lba, endlba);
+		}
+		else if (operation == "write") {
 			iss >> lba;
 			iss >> value;
 			write(lba, value);

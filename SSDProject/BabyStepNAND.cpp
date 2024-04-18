@@ -19,6 +19,16 @@ public:
 		}
 	}
 
+	void erase(int lba, int size) override {
+		readAllNand();
+
+		for (int i = 0; i < size; i++) {
+			m_buffer[lba + i] = NAND_DEFAULT_VALUE;
+		}
+
+		writeAllNand();
+	}
+
 	void write(int lba, std::string value) override {
 		readAllNand();
 
