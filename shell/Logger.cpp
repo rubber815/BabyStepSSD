@@ -111,7 +111,7 @@ public:
 
 			//std::cout << "Size: " << latestLogFile.tellp() << std::endl;
 			// 10 KB = 10240 Bytes (in binary)
-			if (latestLogFile.tellp() > 1) {
+			if (latestLogFile.tellp() > 10240) {
 				recordLog(currentTimeInfo);
 			}
 
@@ -128,8 +128,8 @@ public:
 //FunctionCallLogger* FunctionCallLogger::instance = nullptr;
 
 // Macro to simplify logging
-#define LOG_FUNCTION_CALL(FunctionName, Message) \
-    Logger::getInstance()->print(FunctionName, Message)
+#define LOG_FUNCTION_CALL(Message) \
+    Logger::getInstance()->print(__FUNCTION__, Message)
 
 // Example usage
 // TODO: will be deleted
