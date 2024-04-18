@@ -52,7 +52,7 @@ private:
 	void recordLog(const std::tm& timeinfo) {
 		std::ostringstream newFilename;
 		newFilename << "until_" << std::put_time(&timeinfo, "%y%m%d_%Hh_%Mm_%Ss") << ".log";
-		std::cout << "[Logger]: " << newFilename.str() << " is created!" << std::endl; // TODO : will be removed
+		//std::cout << "[Logger]: " << newFilename.str() << " is created!" << std::endl; // TODO : will be removed
 		closeLogFile();
 
 		std::rename(LATEST_LOG_FILENAME.c_str(), newFilename.str().c_str()); // date log created!!
@@ -100,7 +100,7 @@ public:
 			// Check logfile size and change filename if necessary
 			latestLogFile.flush();
 
-			std::cout << "Size: " << latestLogFile.tellp() << std::endl;
+			//std::cout << "Size: " << latestLogFile.tellp() << std::endl;
 			// 10 KB = 10240 Bytes (in binary)
 			if (latestLogFile.tellp() > 10240) {
 				recordLog(currentTimeInfo);
