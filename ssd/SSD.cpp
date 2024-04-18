@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "../SSDProject/INAND.cpp"
+#include "../ssd/INAND.cpp"
 #include <stdexcept>
 
 class SSD {
