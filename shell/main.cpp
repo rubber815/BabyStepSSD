@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Windows.h>
 #include <conio.h>
 #include <iostream>
@@ -5,6 +7,7 @@
 #include <sstream>
 #include <cstdlib> // For system() function
 #include <io.h>
+#include "Logger.cpp"
 
 bool verifyCommandFormat(const std::string& command) {
 	std::string operation;
@@ -64,6 +67,7 @@ bool erase(std::string lba, std::string size) {
 
 	return true;
 }
+
 bool erase_range(std::string startlba, std::string endlba) {
 	int size = stoi(endlba) - stoi(startlba);
 
@@ -71,21 +75,30 @@ bool erase_range(std::string startlba, std::string endlba) {
 
 	return true;
 }
+
 bool write(std::string lba, std::string value) {
 	std::string str = "ssd ";
 	str = str + "W " + lba + " " + value;
 
-	system(str.c_str());
-	return true;
-}
-bool read(std::string lba) {
-	std::string str = "ssd ";
-	str = str + "R " + lba;
+	LOG_FUNCTION_CALL(__func__, str);
 
 	system(str.c_str());
 	return true;
 }
+
+bool read(std::string lba) {
+	std::string str = "ssd ";
+	str = str + "R " + lba;
+
+	LOG_FUNCTION_CALL(__func__, str);
+
+	system(str.c_str());
+	return true;
+}
+
 bool fullWrite(std::string value) {
+	LOG_FUNCTION_CALL(__func__, value);
+
 	for (int i = 0; i < 100; i++) {
 		std::string str = R"(ssd W )" + std::to_string(i) + " " + value;
 		system(str.c_str());
@@ -111,8 +124,8 @@ std::string readFromResultFile() {
 }
 
 bool fullRead() {
-	// TODO
-	//system("");
+	LOG_FUNCTION_CALL(__func__, "");
+
 	for (int i = 0; i < 100; i++) {
 		std::string str = R"(ssd R )" + std::to_string(i);
 		system(str.c_str());
@@ -122,11 +135,9 @@ bool fullRead() {
 }
 
 bool testApp1() {
-	/*	Full Write + ReadCompare
-	1. fullwrite
-	2. fullread + readcompare
-	*/
 	const std::string input1 = "0xABCDEFAB";
+	LOG_FUNCTION_CALL(__func__, "Full Write: " + input1 + " + ReadCompare");
+
 	for (int lba = 0; lba < 100; lba++) {
 		std::string cmd = "ssd W ";
 		cmd += std::to_string(lba);
@@ -153,11 +164,10 @@ bool testApp2() {
 	const std::string value1 = "0xAAAABBBB";
 	const std::string value2 = "0x12345678";
 
+	LOG_FUNCTION_CALL(__func__, "Full Write: " + value1 + ", " + value2 + " + ReadCompare");
 
 	std::string cmd = R"(ssd W )" + std::to_string(3) + " " + std::string(value1);
 	system(cmd.c_str());
-
-	
 	
 	for (int i = 0; i < agingCnt; i++) {
 		for (int lba = 0; lba <= maxLba; lba++) {
@@ -234,6 +244,9 @@ void doRunner(char* path) {
 		}
 	}
 }
+
+// Static member initialization
+FunctionCallLogger* FunctionCallLogger::instance = nullptr;
 
 int main(int argc, char* argv[]) {
 	// for Runner
