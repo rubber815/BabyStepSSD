@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include "../ssd/BabyStepNAND.cpp"
 #include "../ssd/SSD.cpp"
+#include "test.h"
 
 using namespace testing;
 
@@ -14,7 +15,7 @@ protected:
 		ssd_.selectNAND(&b_nand_);
 
 		for (int i = 0; i < 100; i++)
-			b_nand_.write(i, "0x00000000");
+			b_nand_.write(i, NORMAL_VALUE_ZERO);
 	}
 public:
 	SSD ssd_;
@@ -23,116 +24,102 @@ public:
 
 TEST(NANDTest, Nand_single_write_read_test) {
 	BabyStepNand bsn;
-	bsn.write(0x3, "0x444");
-	EXPECT_EQ("0x444", bsn.read(0x3));
+	bsn.write(NORMAL_LBA_NON_ZERO, NORMAL_VALUE_AAAABBBB);
+	EXPECT_EQ(NORMAL_VALUE_AAAABBBB, bsn.read(NORMAL_LBA_NON_ZERO));
 }
 
 TEST_F(SSDTestWithBabyStepNand, Write_lba_test_with_BabyStep) {
-	ssd_.write(0x4, "0x00000003");
-	EXPECT_EQ("0x00000003",ssd_.read(0x4));
+	ssd_.write(NORMAL_LBA_NON_ZERO, NORMAL_VALUE_0000AAAA);
+	EXPECT_EQ(NORMAL_VALUE_0000AAAA, ssd_.read(NORMAL_LBA_NON_ZERO));
 }
 
 TEST_F(SSDTestWithBabyStepNand, Full_Read_test_with_BabyStep_Normal_Success) {
-	const std::string input = "0xABCDEFAB";
-	for (int lba = 0; lba < 100; lba++) {
-		ssd_.write(lba, input);
-	}
+	for (int lba = 0; lba < 100; lba++)
+		ssd_.write(lba, NORMAL_VALUE_AAAABBBB);
 
-	for (int lba = 0; lba < 100; lba++) {
-		std::string ret = ssd_.read(lba);
-		EXPECT_EQ(ret, input);
-	}
+	for (int lba = 0; lba < 100; lba++)
+		EXPECT_EQ(ssd_.read(lba), NORMAL_VALUE_AAAABBBB);
 }
 	
 
 TEST_F(SSDTestWithBabyStepNand, Full_Read_test_with_BabyStep_Normal_Fail) {
-	const std::string input1 = "0xABCDEFAB";
-	for (int lba = 0; lba < 50; lba++) {
-		ssd_.write(lba, input1);
-	}
+	for (int lba = 0; lba < 50; lba++)
+		ssd_.write(lba, NORMAL_VALUE_AAAABBBB);
 
-	const std::string input2 = "0xABCDAAAA";
-	for (int lba = 50; lba < 100; lba++) {
-		ssd_.write(lba, input2);
-	}
+	for (int lba = 50; lba < 100; lba++)
+		ssd_.write(lba, NORMAL_VALUE_0000AAAA);
 
-	for (int lba = 0; lba < 50; lba++) {
-		std::string ret = ssd_.read(lba);
-		EXPECT_EQ(ret, input1);
-	}
+	for (int lba = 0; lba < 50; lba++)
+		EXPECT_EQ(ssd_.read(lba), NORMAL_VALUE_AAAABBBB);
 
-	for (int lba = 50; lba < 100; lba++) {
-		std::string ret = ssd_.read(lba);
-		EXPECT_NE(ret, input1);
-	}
+	for (int lba = 50; lba < 100; lba++)
+		EXPECT_NE(ssd_.read(lba), NORMAL_VALUE_AAAABBBB);
 }
 
 TEST_F(SSDTestWithBabyStepNand, Write_lower_lba_fail_on_ssd_but_no_throw_test) {
-	EXPECT_NO_THROW(ssd_.write(-1, "0x00000003"));
+	EXPECT_NO_THROW(ssd_.write(INVALID_LBA_UNDER_RANGE, NORMAL_VALUE_AAAABBBB));
 }
 
 TEST_F(SSDTestWithBabyStepNand, Write_upper_lba_fail_on_ssd_but_no_throw_test) {
-	EXPECT_NO_THROW(ssd_.write(101, "0x00000003"));
+	EXPECT_NO_THROW(ssd_.write(INVALID_LBA_UNDER_RANGE, NORMAL_VALUE_AAAABBBB));
 }
 
 TEST_F(SSDTestWithBabyStepNand, Write_data_out_of_range_fail_on_ssd_but_no_throw_test) {
-	EXPECT_NO_THROW(ssd_.write(3, "0x0000000003"));
+	EXPECT_NO_THROW(ssd_.write(NORMAL_LBA_NON_ZERO, INVALID_VALUE_ZERO_OVER_RANGE));
 }
 
 TEST_F(SSDTestWithBabyStepNand, Write_data_prefix_fail_on_ssd_but_no_throw_test) {
-	EXPECT_NO_THROW(ssd_.write(3, "xx00000003"));
+	EXPECT_NO_THROW(ssd_.write(NORMAL_LBA_NON_ZERO, INVALID_VALUE_WRONG_PREFIX));
 }
 
 TEST_F(SSDTestWithBabyStepNand, Write_Read_test_normal_success) {
-	ssd_.write(0, "0xAAAABBBB");
-	EXPECT_EQ("0xAAAABBBB", ssd_.read(0));
+	ssd_.write(NORMAL_LBA_ZERO, NORMAL_VALUE_AAAABBBB);
+	EXPECT_EQ(NORMAL_VALUE_AAAABBBB, ssd_.read(NORMAL_LBA_ZERO));
 
-	ssd_.write(30, "0x0000AAAA");
-	EXPECT_EQ("0x0000AAAA", ssd_.read(30));
+	ssd_.write(NORMAL_LBA_10, NORMAL_VALUE_AAAABBBB);
+	EXPECT_EQ(NORMAL_VALUE_AAAABBBB, ssd_.read(NORMAL_LBA_10));
 }
 
 TEST_F(SSDTestWithBabyStepNand, Write_Read_test_not_written_lba) {
-	ssd_.write(0, "0xAAAABBBB");
-	EXPECT_EQ("0xAAAABBBB", ssd_.read(0));
-
-	// ssd_.write(30, "0x0000AAAA");
-	EXPECT_EQ("0x00000000", ssd_.read(30));
+	ssd_.write(NORMAL_LBA_ZERO, NORMAL_VALUE_AAAABBBB);
+	EXPECT_EQ(NORMAL_VALUE_AAAABBBB, ssd_.read(NORMAL_LBA_ZERO));
+	EXPECT_EQ(NORMAL_VALUE_ZERO, ssd_.read(NORMAL_LBA_30));
 }
 
 TEST_F(SSDTestWithBabyStepNand, fullWrite_success_test_with_BabyStep) {
 	for (int i = 0; i < 100; i++)
-		ssd_.write(i, "0xABCDFFFF");
+		ssd_.write(i, NORMAL_VALUE_AAAABBBB);
 
 	for (int i = 0; i < 100; i++)
-		EXPECT_EQ("0xABCDFFFF", ssd_.read(i));
+		EXPECT_EQ(NORMAL_VALUE_AAAABBBB, ssd_.read(i));
 }
 
 TEST_F(SSDTestWithBabyStepNand, fullWrite_fail_on_ssd_but_no_throw_test_lba1_with_BabyStep) {
 	for (int i = 0; i < 100; i++)
-		EXPECT_NO_THROW(ssd_.write(i-100, "0xABCDFFFF"));
+		EXPECT_NO_THROW(ssd_.write(i - 100, NORMAL_VALUE_AAAABBBB));
 }
 
 TEST_F(SSDTestWithBabyStepNand, fullWrite_fail_on_ssd_but_no_throw_test_lba2_with_BabyStep) {
 	for (int i = 0; i < 100; i++)
-		EXPECT_NO_THROW(ssd_.write(i + 100, "0xABCDFFFF"));
+		EXPECT_NO_THROW(ssd_.write(i + 100, NORMAL_VALUE_AAAABBBB));
 }
 
 TEST_F(SSDTestWithBabyStepNand, fullWrite_fail_on_ssd_but_no_throw_test_value1_with_BabyStep) {
 	for (int i = 0; i < 100; i++)
-		EXPECT_NO_THROW(ssd_.write(i, "xxABCDFFFF"));
+		EXPECT_NO_THROW(ssd_.write(i, INVALID_VALUE_WRONG_PREFIX));
 }
 
 TEST_F(SSDTestWithBabyStepNand, fullWrite_fail_on_ssd_but_no_throw_test_value2_with_BabyStep) {
 	for (int i = 0; i < 100; i++)
-		EXPECT_NO_THROW(ssd_.write(i, "0xABCDFFFFFF"));
+		EXPECT_NO_THROW(ssd_.write(i, INVALID_VALUE_ZERO_OVER_RANGE));
 }
 
 TEST_F(SSDTestWithBabyStepNand, fullWrite_twice_success_test_with_BabyStep) {
 	for (int i = 0; i < 100; i++) {
-		ssd_.write(i, "0xABCDFFFF");
-		ssd_.write(i, "0x99999999");
+		ssd_.write(i, NORMAL_VALUE_AAAABBBB);
+		ssd_.write(i, NORMAL_VALUE_0000AAAA);
 	}
 
 	for (int i = 0; i < 100; i++)
-		EXPECT_EQ("0x99999999", ssd_.read(i));
+		EXPECT_EQ(NORMAL_VALUE_0000AAAA, ssd_.read(i));
 }

@@ -5,6 +5,7 @@
 #include "../ssd/INAND.cpp"
 #include "../ssd/SSD.cpp"
 #include <stdexcept>
+#include "test.h"
 
 using namespace testing;
 
@@ -26,73 +27,71 @@ public:
 };
 
 TEST_F(SSDTest, Write_lba_test) {
-	EXPECT_CALL(m_nand_, write(0, "0x00000000"))
-		.Times(1);
-	ssd_.write(0, "0x00000000");
+	EXPECT_CALL(m_nand_, write(NORMAL_LBA_ZERO, NORMAL_VALUE_ZERO))
+		.Times(CALLED_TIME_ONE);
+	ssd_.write(NORMAL_LBA_ZERO, NORMAL_VALUE_ZERO);
 }
 
 TEST_F(SSDTest, Write_lower_lba_fail_on_ssd_but_no_throw_test) {
-	EXPECT_CALL(m_nand_, write(-1, "0x00000000"))
-		.Times(0);
+	EXPECT_CALL(m_nand_, write(INVALID_LBA_UNDER_RANGE, NORMAL_VALUE_ZERO))
+		.Times(CALLED_TIME_ZERO);
 
-	EXPECT_NO_THROW(ssd_.write(-1, "0x00000000"));
+	EXPECT_NO_THROW(ssd_.write(INVALID_LBA_UNDER_RANGE, NORMAL_VALUE_ZERO));
 }
 
 TEST_F(SSDTest, Write_upper_lba_fail_on_ssd_but_no_throw_test) {
-	EXPECT_CALL(m_nand_, write(101, "0x00000000"))
-		.Times(0);
+	EXPECT_CALL(m_nand_, write(INVALID_LBA_OVER_RANGE, NORMAL_VALUE_ZERO))
+		.Times(CALLED_TIME_ZERO);
 
-	EXPECT_NO_THROW(ssd_.write(101, "0x00000000"));
+	EXPECT_NO_THROW(ssd_.write(INVALID_LBA_OVER_RANGE, NORMAL_VALUE_ZERO));
 }
 
 TEST_F(SSDTest, Write_data_out_of_rang_fail_on_ssd_but_no_throw_test) {
-	EXPECT_CALL(m_nand_, write(0, "0x0000000000"))
-		.Times(0);
+	EXPECT_CALL(m_nand_, write(NORMAL_LBA_ZERO, INVALID_VALUE_ZERO_OVER_RANGE))
+		.Times(CALLED_TIME_ZERO);
 
-	EXPECT_NO_THROW(ssd_.write(0, "0x0000000000"));
+	EXPECT_NO_THROW(ssd_.write(NORMAL_LBA_ZERO, INVALID_VALUE_ZERO_OVER_RANGE));
 }
 
 TEST_F(SSDTest, Write_data_prefix_fail_on_ssd_but_no_throw_test) {
-	EXPECT_CALL(m_nand_, write(0, "xx00000000"))
-		.Times(0);
+	EXPECT_CALL(m_nand_, write(NORMAL_LBA_ZERO, INVALID_VALUE_WRONG_PREFIX))
+		.Times(CALLED_TIME_ZERO);
 
-	EXPECT_NO_THROW(ssd_.write(0, "xx00000000"));
+	EXPECT_NO_THROW(ssd_.write(NORMAL_LBA_ZERO, INVALID_VALUE_WRONG_PREFIX));
 }
 
 TEST_F(SSDTest, Read_test_normal_success) {
-	int testLBA1 = 0;
-	EXPECT_CALL(m_nand_, read(testLBA1))
-		.WillOnce(Return("0xAAAABBBB"));
-	EXPECT_THAT(ssd_.read(testLBA1), Eq("0xAAAABBBB"));
+	EXPECT_CALL(m_nand_, read(NORMAL_LBA_ZERO))
+		.WillOnce(Return(NORMAL_VALUE_AAAABBBB));
+	EXPECT_THAT(ssd_.read(NORMAL_LBA_ZERO), Eq(NORMAL_VALUE_AAAABBBB));
 
-	int testLBA2 = 30;
-	EXPECT_CALL(m_nand_, read(testLBA2))
-		.WillOnce(Return("0x0000AAAA"));
-	EXPECT_THAT(ssd_.read(testLBA2), Eq("0x0000AAAA"));
+	EXPECT_CALL(m_nand_, read(NORMAL_LBA_10))
+		.WillOnce(Return(NORMAL_VALUE_0000AAAA));
+	EXPECT_THAT(ssd_.read(NORMAL_LBA_10), Eq(NORMAL_VALUE_0000AAAA));
 }
 
 TEST_F(SSDTest, Read_test_boundary_check_fail_on_ssd_but_no_throw_test) {
-	EXPECT_CALL(m_nand_, read(-1))
-		.Times(0);
+	EXPECT_CALL(m_nand_, read(INVALID_LBA_UNDER_RANGE))
+		.Times(CALLED_TIME_ZERO);
 
-	EXPECT_THAT(ssd_.read(-1), Eq(""));
+	EXPECT_THAT(ssd_.read(INVALID_LBA_UNDER_RANGE), Eq(EMPTY_STRING));
 
-	EXPECT_CALL(m_nand_, read(100))
-		.Times(0);
-	EXPECT_THAT(ssd_.read(100), Eq(""));
+	EXPECT_CALL(m_nand_, read(INVALID_LBA_OVER_RANGE))
+		.Times(CALLED_TIME_ZERO);
+	EXPECT_THAT(ssd_.read(INVALID_LBA_OVER_RANGE), Eq(EMPTY_STRING));
 }
 
 TEST_F(SSDTest, Read_test_not_written_lba) {
 	{
 		InSequence seq;
-		EXPECT_CALL(m_nand_, write(20, "0x1289CDEF"))
-			.Times(1);
-		EXPECT_CALL(m_nand_, read(20))
-			.WillOnce(Return("0x1289CDEF"));
-		EXPECT_CALL(m_nand_, read(10))
-			.WillOnce(Return("0x00000000"));
+		EXPECT_CALL(m_nand_, write(NORMAL_LBA_30, NORMAL_VALUE_1289CDEF))
+			.Times(CALLED_TIME_ONE);
+		EXPECT_CALL(m_nand_, read(NORMAL_LBA_30))
+			.WillOnce(Return(NORMAL_VALUE_1289CDEF));
+		EXPECT_CALL(m_nand_, read(NORMAL_LBA_10))
+			.WillOnce(Return(NORMAL_VALUE_ZERO));
 	}
-	ssd_.write(20, "0x1289CDEF");
-	EXPECT_THAT(ssd_.read(20), Eq("0x1289CDEF"));
-	EXPECT_THAT(ssd_.read(10), Eq("0x00000000"));
+	ssd_.write(NORMAL_LBA_30, NORMAL_VALUE_1289CDEF);
+	EXPECT_THAT(ssd_.read(NORMAL_LBA_30), Eq(NORMAL_VALUE_1289CDEF));
+	EXPECT_THAT(ssd_.read(NORMAL_LBA_10), Eq(NORMAL_VALUE_ZERO));
 }
