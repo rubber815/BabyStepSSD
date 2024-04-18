@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -7,50 +9,42 @@
 
 #include <chrono>
 #include <thread>
+
 /*
 Function call logger
 that manages the log output by the test shell
 */
 class FunctionCallLogger {
 private:
-    std::ofstream logfile;
-    const std::string filename = "latest.log";
+    const std::string LATEST_LOG_FILENAME = "latest.log"; // default file name: will be changed to date_time.log
+
+    std::ofstream latestLogFile;
+
     static FunctionCallLogger* instance;
-    int count = 0;
+    int count = 0; // 
+
+    std::string theOldestFileName = "INVALID_FILE_NAME";
 
     FunctionCallLogger() {
-        // Open the log file
         openLogFile();
     }
 
+    /* 1. ctor, 2. end of changeFileName*/
     void openLogFile() {
-        logfile.open(filename, std::ios::app);
-        if (!logfile.is_open()) {
-            std::cerr << "Error: Unable to open log file\n";
+        latestLogFile.open(LATEST_LOG_FILENAME, std::ios::app); // open new latest.log
+        if (!latestLogFile.is_open()) {
+            std::cerr << "Error: Unable to open new latest.log" << std::endl;
         }
     }
 
     void closeLogFile() {
-        if (logfile.is_open()) {
-            logfile.close();
+        if (latestLogFile.is_open()) {
+            latestLogFile.close(); // close latest.log
         }
     }
 
     void changeFileName(const std::tm& timeinfo) {
-        std::ostringstream newFilename;
-        newFilename << "until_" << std::put_time(&timeinfo, "%y%m%d_%H%M%S") << ".log";
-        std::cout << newFilename.str() << std::endl;
-        closeLogFile();
-        std::rename(filename.c_str(), newFilename.str().c_str());
-        count++;
-        //filename = newFilename.str();
-        if (count == 2) {
-            std::cout << "two" << std::endl;
-            std::ostringstream newZip;
-            newZip << "until_" << std::put_time(&timeinfo, "%y%m%d_%H%M%S") << ".zip";
-            std::rename(newFilename.str().c_str(), newZip.str().c_str());
-        }
-        openLogFile();
+        // TODO:
     }
 public:
     // Singleton instance
@@ -67,7 +61,8 @@ public:
 
     /* Output format: [date time] function name()         : log message */
     void print(const std::string& functionName, const std::string& message) {
-        if (logfile.is_open()) {
+        if (latestLogFile.is_open()) {
+
             // Get current time
             std::time_t now = std::time(nullptr);
             std::tm timeinfo;
@@ -80,38 +75,37 @@ public:
             // Log function call with time information
             /* When the screen is output,
             the print function writes the file simultaneously.*/
-            std::cout << buffer << " " << functionName << " : " << message << std::endl;
-            logfile << buffer << " " << functionName << " : " << message << std::endl;
+            std::cout << buffer << " " << functionName << " : " << message << std::endl; // screen print
+            latestLogFile << buffer << " " << functionName << " : " << message << std::endl; // latest.log file write
 
-            // Check logfile size and change filename if necessary
-            logfile.flush();
-            //if (logfile.tellp() > 10240) { // 10KB
-            if (logfile.tellp() > 1) {
-                changeFileName(timeinfo);
-            }
+            // TODO: Check logfile size and change filename if necessary
+            //latestLogFile.flush();
+            ////if (logfile.tellp() > 10240) { // 10KB
+            //if (latestLogFile.tellp() > 1) {
+            //    changeFileName(timeinfo);
+            //}
 
+            // TODO
             /*  1. When "two" until_date_time.log files are created,
                     Compresses the oldest created log file.
                 2. Assuming you have used Compressed Library,
                     change only the file name from .log --> .zip.*/
-            if (count == 2) {
-                std::cout << "two" << std::endl;
-            }
         }
     }
 };
 
 // Static member initialization
-FunctionCallLogger* FunctionCallLogger::instance = nullptr;
+//FunctionCallLogger* FunctionCallLogger::instance = nullptr;
 
 // Macro to simplify logging
 #define LOG_FUNCTION_CALL(FunctionName, Message) \
     FunctionCallLogger::getInstance()->print(FunctionName, Message)
 
 // Example usage
-void someFunction() {
-    //LOG_FUNCTION_CALL(__FUNCTION__);
-    // Your function logic here
-    LOG_FUNCTION_CALL(__func__, "Some message");
-    // Your function logic here
-}
+// TODO: will be deleted
+//void someFunction() {
+//    //LOG_FUNCTION_CALL(__FUNCTION__);
+//    // Your function logic here
+//    LOG_FUNCTION_CALL(__func__, "Some message");
+//    // Your function logic here
+//}
