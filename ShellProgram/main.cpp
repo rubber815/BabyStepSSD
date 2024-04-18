@@ -48,14 +48,14 @@ bool exit() {
 }
 
 bool write(std::string lba, std::string value) {
-	std::string str = "SSDProject ";
+	std::string str = "ssd ";
 	str = str + "W " + lba + " " + value;
 
 	system(str.c_str());
 	return true;
 }
 bool read(std::string lba) {
-	std::string str = "SSDProject ";
+	std::string str = "ssd ";
 	str = str + "R " + lba;
 
 	system(str.c_str());
@@ -63,7 +63,7 @@ bool read(std::string lba) {
 }
 bool fullWrite(std::string value) {
 	for (int i = 0; i < 100; i++) {
-		std::string str = R"(SSDProject W )" + std::to_string(i) + " " + value;
+		std::string str = R"(ssd W )" + std::to_string(i) + " " + value;
 		system(str.c_str());
 	}
 
@@ -90,7 +90,7 @@ bool fullRead() {
 	// TODO
 	//system("");
 	for (int i = 0; i < 100; i++) {
-		std::string str = R"(SSDProject R )" + std::to_string(i);
+		std::string str = R"(ssd R )" + std::to_string(i);
 		system(str.c_str());
 		std::cout << readFromResultFile() << std::endl;
 	}
@@ -104,13 +104,13 @@ bool testApp1() {
 	*/
 	const std::string input1 = "0xABCDEFAB";
 	for (int lba = 0; lba < 100; lba++) {
-		std::string cmd = "SSDProject W ";
+		std::string cmd = "ssd W ";
 		cmd += std::to_string(lba);
 		cmd += " " + input1;
 		system(cmd.c_str());
 	}
 	for (int lba = 0; lba < 100; lba++) {
-		std::string cmd = "SSDProject R ";
+		std::string cmd = "ssd R ";
 		cmd += std::to_string(lba);
 		system(cmd.c_str());
 
@@ -130,25 +130,25 @@ bool testApp2() {
 	const std::string value2 = "0x12345678";
 
 
-	std::string cmd = R"(SSDProject W )" + std::to_string(3) + " " + std::string(value1);
+	std::string cmd = R"(ssd W )" + std::to_string(3) + " " + std::string(value1);
 	system(cmd.c_str());
 
 	
 	
 	for (int i = 0; i < agingCnt; i++) {
 		for (int lba = 0; lba <= maxLba; lba++) {
-			std::string cmd = R"(SSDProject W )" + std::to_string(lba) + " " + std::string(value1);
+			std::string cmd = R"(ssd W )" + std::to_string(lba) + " " + std::string(value1);
 			system(cmd.c_str());
 		}
 	}
 
 	for (int lba = 0; lba <= maxLba; lba++) {
-		std::string cmd = R"(SSDProject W )" + std::to_string(lba) + " " + std::string(value2);
+		std::string cmd = R"(ssd W )" + std::to_string(lba) + " " + std::string(value2);
 		system(cmd.c_str());
 	}
 
 	for (int lba = 0; lba <= maxLba; lba++) {
-		std::string cmd = R"(SSDProject R )" + std::to_string(lba);
+		std::string cmd = R"(ssd R )" + std::to_string(lba);
 		system(cmd.c_str());
 		std::string retValue = readFromResultFile();
 		if (retValue == value2) {
@@ -169,7 +169,7 @@ bool testApp2() {
 
 int main() {
 	std::string command, operation, lba, value;
-	std::string cmd = "SSDProject ";
+	std::string cmd = "ssd ";
 
 	while (true) {
 		std::cout << "Welcome to ShellProgram!!: "; // Updated prompt
@@ -221,8 +221,8 @@ int main() {
 			testApp2();
 
 		// for reference: Execute the .exe file
-		//system("SSDProject W 1 0x11111111");
-		//system("SSDProject W 2 0x22222222");
-		//system("SSDProject R 1");
+		//system("ssd W 1 0x11111111");
+		//system("ssd W 2 0x22222222");
+		//system("ssd R 1");
 	}
 }
