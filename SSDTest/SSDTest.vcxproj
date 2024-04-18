@@ -81,7 +81,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PreprocessorDefinitions>X64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -100,7 +100,7 @@
     <ClCompile Include="ssd_test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SSDProject\SSDProject.vcxproj">
+    <ProjectReference Include="..\ssd\ssd.vcxproj">
       <Project>{de724ed6-24bb-4012-a884-6657ea0aa54c}</Project>
     </ProjectReference>
   </ItemGroup>

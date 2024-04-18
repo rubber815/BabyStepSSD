@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "../SSDProject/INAND.cpp"
-#include "../SSDProject/SSD.cpp"
+#include "../ssd/INAND.cpp"
+#include "../ssd/SSD.cpp"
 #include <stdexcept>
 
 using namespace testing;

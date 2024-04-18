@@ -3,8 +3,8 @@
 #include <gtest/gtest.h>
 
 #include <stdexcept>
-#include "../SSDProject/BabyStepNAND.cpp"
-#include "../SSDProject/SSD.cpp"
+#include "../ssd/BabyStepNAND.cpp"
+#include "../ssd/SSD.cpp"
 
 using namespace testing;
 
