@@ -169,7 +169,40 @@ bool testApp2() {
 	return true;
 }
 
-int main() {
+bool isValidFilePath(char* path) {
+	std::ifstream runnerFile(path);
+
+	if (!runnerFile.is_open()) {
+		std::cout << "Failed to open file for reading." << std::endl;
+		return false;
+	}
+	return true;
+}
+
+void doRunner(char* path) {
+	std::string funcName;
+	std::ifstream runnerFile(path);
+
+	while (!runnerFile.eof()) {
+		std::getline(runnerFile, funcName);
+		if (funcName == "testApp1") testApp1();
+		else if (funcName == "testApp2") testApp2();
+		system(funcName.c_str());
+	}
+}
+
+int main(int argc, char* argv[]) {
+	// for Runner
+	if (argc > 1) {
+		std::cout << argv[1] << std::endl;
+		if (!isValidFilePath(argv[1])) {
+			return 0;
+		}
+		doRunner(argv[1]);
+			
+		return 0;
+	}
+
 	std::string command, operation, lba, value;
 	std::string cmd = "ssd ";
 
