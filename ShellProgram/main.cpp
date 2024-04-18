@@ -32,6 +32,10 @@ void help() {
 	std::cout << "* [ShellProgram commands help]" << std::endl;
 	std::cout << "* exit: terminate shell" << std::endl;
 	std::cout << "* help: print the usage for each command" << std::endl;
+	std::cout << "* erase: erase to SSD" << std::endl;
+	std::cout << "*		format: erase <LBA> <SIZE>" << std::endl;
+	std::cout << "* erase_range: erase_range to SSD" << std::endl;
+	std::cout << "*		format: write <STARTLBA> <ENDLBA>" << std::endl;
 	std::cout << "* write: write to SSD" << std::endl;
 	std::cout << "*		format: write <LBA> <VALUE>" << std::endl;
 	std::cout << "* read: read from SSD" << std::endl;
