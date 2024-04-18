@@ -14,7 +14,9 @@ bool verifyCommandFormat(const std::string& command) {
 		operation == "exit" ||
 		operation == "help" ||
 		operation == "fullwrite" ||
-		operation == "fullread") {
+		operation == "fullread" ||
+		operation == "testapp1" ||
+		operation == "testapp2") {
 		return true;
 	}
 
