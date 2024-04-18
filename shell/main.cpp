@@ -9,6 +9,8 @@
 #include <io.h>
 #include "Logger.cpp"
 
+#define APP_NAME "ssd "
+
 bool verifyCommandFormat(const std::string& command) {
 	std::string operation;
 	std::istringstream iss(command);
@@ -59,11 +61,15 @@ bool exit() {
 	return false;
 }
 
-bool erase(std::string lba, std::string size) {
-	std::string str = "ssd ";
-	str = str + "E " + lba + " " + size;
+std::string makeSSDCommand(std::string cmd, std::string arg1, std::string arg2) {
+	std::string result;
+	result = APP_NAME + cmd + " " + arg1 + " " + arg2;
 
-	system(str.c_str());
+	return result;
+}
+
+bool erase(std::string lba, std::string size) {
+	system(makeSSDCommand("E", lba, size).c_str());
 
 	return true;
 }
@@ -77,32 +83,24 @@ bool erase_range(std::string startlba, std::string endlba) {
 }
 
 bool write(std::string lba, std::string value) {
-	std::string str = "ssd ";
-	str = str + "W " + lba + " " + value;
-
+	std::string str = makeSSDCommand("W", lba, value).c_str();
 	LOG_FUNCTION_CALL(__func__, str);
-
 	system(str.c_str());
+
 	return true;
 }
-
 bool read(std::string lba) {
-	std::string str = "ssd ";
-	str = str + "R " + lba;
-
+	std::string str = makeSSDCommand("R", lba, "").c_str();
 	LOG_FUNCTION_CALL(__func__, str);
-
 	system(str.c_str());
+
 	return true;
 }
 
 bool fullWrite(std::string value) {
 	LOG_FUNCTION_CALL(__func__, value);
-
-	for (int i = 0; i < 100; i++) {
-		std::string str = R"(ssd W )" + std::to_string(i) + " " + value;
-		system(str.c_str());
-	}
+	for (int i = 0; i < 100; i++)
+		system(makeSSDCommand("W", std::to_string(i), value).c_str());
 
 	return false;
 }
@@ -127,8 +125,7 @@ bool fullRead() {
 	LOG_FUNCTION_CALL(__func__, "");
 
 	for (int i = 0; i < 100; i++) {
-		std::string str = R"(ssd R )" + std::to_string(i);
-		system(str.c_str());
+		system(makeSSDCommand("R", std::to_string(i), "").c_str());
 		std::cout << readFromResultFile() << std::endl;
 	}
 	return false;
@@ -138,16 +135,11 @@ bool testApp1() {
 	const std::string input1 = "0xABCDEFAB";
 	LOG_FUNCTION_CALL(__func__, "Full Write: " + input1 + " + ReadCompare");
 
+	for (int lba = 0; lba < 100; lba++)
+		system(makeSSDCommand("W", std::to_string(lba), input1).c_str());
+
 	for (int lba = 0; lba < 100; lba++) {
-		std::string cmd = "ssd W ";
-		cmd += std::to_string(lba);
-		cmd += " " + input1;
-		system(cmd.c_str());
-	}
-	for (int lba = 0; lba < 100; lba++) {
-		std::string cmd = "ssd R ";
-		cmd += std::to_string(lba);
-		system(cmd.c_str());
+		system(makeSSDCommand("R", std::to_string(lba), "").c_str());
 
 		// Compare
 		std::string read_val = readFromResultFile();
@@ -166,40 +158,17 @@ bool testApp2() {
 
 	LOG_FUNCTION_CALL(__func__, "Full Write: " + value1 + ", " + value2 + " + ReadCompare");
 
-	std::string cmd = R"(ssd W )" + std::to_string(3) + " " + std::string(value1);
-	system(cmd.c_str());
-	
 	for (int i = 0; i < agingCnt; i++) {
-		for (int lba = 0; lba <= maxLba; lba++) {
-			std::string cmd = R"(ssd W )" + std::to_string(lba) + " " + std::string(value1);
-			system(cmd.c_str());
-		}
+		for (int lba = 0; lba <= maxLba; lba++)
+			system(makeSSDCommand("W", std::to_string(lba), value1).c_str());
 	}
 
-	for (int lba = 0; lba <= maxLba; lba++) {
-		std::string cmd = R"(ssd W )" + std::to_string(lba) + " " + std::string(value2);
-		system(cmd.c_str());
-	}
+	for (int lba = 0; lba <= maxLba; lba++)
+		system(makeSSDCommand("W", std::to_string(lba), value2).c_str());
 
-	for (int lba = 0; lba <= maxLba; lba++) {
-		std::string cmd = R"(ssd R )" + std::to_string(lba);
-		system(cmd.c_str());
-		std::string retValue = readFromResultFile();
-#if 0
-		if (retValue == value2) {
-			std::cout << "TestApp2: Read compare after "
-				"write aging: Passed, LBA: " << lba
-				<< ", Expected: " << value2 << ", Actual: "
-				<< retValue << std::endl;
-		}
-		else {
-			std::cout << "TestApp2: Read compare after "
-				"write aging: Failed, LBA: " << lba
-				<< ", Expected: " << value2 << ", Actual: "
-				<< retValue << std::endl;
-		}
-#endif
-	}
+	for (int lba = 0; lba <= maxLba; lba++)
+		system(makeSSDCommand("R", std::to_string(lba), "").c_str());
+
 	return true;
 }
 
@@ -214,15 +183,14 @@ bool isValidFilePath(char* path) {
 }
 
 void doRunner(char* path) {
+	bool result;
 	std::string funcName;
 	std::ifstream runnerFile(path);
 
 	while (!runnerFile.eof()) {
-		bool result = false;
+		result = false;
 		
 		std::getline(runnerFile, funcName);
-		std::cout << funcName << " --- Run...";
-
 		if (funcName == "testApp1") {
 			result = testApp1();
 		}
@@ -235,6 +203,8 @@ void doRunner(char* path) {
 				result = true;
 			}
 		}
+		std::cout << funcName << " --- Run...";
+
 		if (result) {
 			std::cout << "Pass" << std::endl;
 		}
