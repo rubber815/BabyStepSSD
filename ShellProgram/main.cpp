@@ -6,6 +6,8 @@
 #include <cstdlib> // For system() function
 #include <io.h>
 
+#define APP_NAME "ssd "
+
 bool verifyCommandFormat(const std::string& command) {
 	std::string operation;
 	std::istringstream iss(command);
@@ -56,11 +58,15 @@ bool exit() {
 	return false;
 }
 
-bool erase(std::string lba, std::string size) {
-	std::string str = "ssd ";
-	str = str + "E " + lba + " " + size;
+std::string makeSSDCommand(std::string cmd, std::string arg1, std::string arg2) {
+	std::string result;
+	result = APP_NAME + cmd + " " + arg1 + " " + arg2;
 
-	system(str.c_str());
+	return result;
+}
+
+bool erase(std::string lba, std::string size) {
+	system(makeSSDCommand("E", lba, size).c_str());
 
 	return true;
 }
@@ -72,24 +78,18 @@ bool erase_range(std::string startlba, std::string endlba) {
 	return true;
 }
 bool write(std::string lba, std::string value) {
-	std::string str = "ssd ";
-	str = str + "W " + lba + " " + value;
+	system(makeSSDCommand("W", lba, value).c_str());
 
-	system(str.c_str());
 	return true;
 }
 bool read(std::string lba) {
-	std::string str = "ssd ";
-	str = str + "R " + lba;
+	system(makeSSDCommand("R", lba, "").c_str());
 
-	system(str.c_str());
 	return true;
 }
 bool fullWrite(std::string value) {
-	for (int i = 0; i < 100; i++) {
-		std::string str = R"(ssd W )" + std::to_string(i) + " " + value;
-		system(str.c_str());
-	}
+	for (int i = 0; i < 100; i++)
+		system(makeSSDCommand("E", std::to_string(i), value).c_str());
 
 	return false;
 }
@@ -111,11 +111,8 @@ std::string readFromResultFile() {
 }
 
 bool fullRead() {
-	// TODO
-	//system("");
 	for (int i = 0; i < 100; i++) {
-		std::string str = R"(ssd R )" + std::to_string(i);
-		system(str.c_str());
+		system(makeSSDCommand("R", std::to_string(i), "value").c_str());
 		std::cout << readFromResultFile() << std::endl;
 	}
 	return false;
@@ -127,16 +124,11 @@ bool testApp1() {
 	2. fullread + readcompare
 	*/
 	const std::string input1 = "0xABCDEFAB";
+	for (int lba = 0; lba < 100; lba++)
+		system(makeSSDCommand("W", std::to_string(lba), input1).c_str());
+
 	for (int lba = 0; lba < 100; lba++) {
-		std::string cmd = "ssd W ";
-		cmd += std::to_string(lba);
-		cmd += " " + input1;
-		system(cmd.c_str());
-	}
-	for (int lba = 0; lba < 100; lba++) {
-		std::string cmd = "ssd R ";
-		cmd += std::to_string(lba);
-		system(cmd.c_str());
+		system(makeSSDCommand("R", std::to_string(lba), "").c_str());
 
 		// Compare
 		std::string read_val = readFromResultFile();
@@ -153,29 +145,23 @@ bool testApp2() {
 	const std::string value1 = "0xAAAABBBB";
 	const std::string value2 = "0x12345678";
 
-
-	std::string cmd = R"(ssd W )" + std::to_string(3) + " " + std::string(value1);
-	system(cmd.c_str());
+	system(makeSSDCommand("W", std::to_string(3), value1).c_str());
 
 	
 	
 	for (int i = 0; i < agingCnt; i++) {
-		for (int lba = 0; lba <= maxLba; lba++) {
-			std::string cmd = R"(ssd W )" + std::to_string(lba) + " " + std::string(value1);
-			system(cmd.c_str());
-		}
+		for (int lba = 0; lba <= maxLba; lba++)
+			system(makeSSDCommand("W", std::to_string(lba), value1).c_str());
 	}
 
-	for (int lba = 0; lba <= maxLba; lba++) {
-		std::string cmd = R"(ssd W )" + std::to_string(lba) + " " + std::string(value2);
-		system(cmd.c_str());
-	}
+	for (int lba = 0; lba <= maxLba; lba++)
+		system(makeSSDCommand("W", std::to_string(lba), value2).c_str());
 
 	for (int lba = 0; lba <= maxLba; lba++) {
-		std::string cmd = R"(ssd R )" + std::to_string(lba);
-		system(cmd.c_str());
-		std::string retValue = readFromResultFile();
+		system(makeSSDCommand("R", std::to_string(lba), "").c_str());
+
 #if 0
+		std::string retValue = readFromResultFile();
 		if (retValue == value2) {
 			std::cout << "TestApp2: Read compare after "
 				"write aging: Passed, LBA: " << lba
@@ -204,11 +190,12 @@ bool isValidFilePath(char* path) {
 }
 
 void doRunner(char* path) {
+	bool result;
 	std::string funcName;
 	std::ifstream runnerFile(path);
 
 	while (!runnerFile.eof()) {
-		bool result = false;
+		result = false;
 		
 		std::getline(runnerFile, funcName);
 		std::cout << funcName << " --- Run...";
