@@ -203,6 +203,7 @@ class Command {
 public:
 	virtual ~Command() {}
 	virtual void execute() = 0;
+	virtual std::string getResult() { return ""; };
 };
 
 // Concrete Command for Read operation
@@ -210,11 +211,17 @@ class ReadCommand : public Command {
 private:
 	SSD* ssd;
 	int address;
+
+	std::string result;
 public:
 	ReadCommand(SSD* ssd, int address) : ssd(ssd), address(address) {}
 
 	void execute() override {
-		ssd->read(address);
+		result = ssd->read(address);
+	}
+
+	std::string getResult() {
+		return result;
 	}
 };
 
@@ -260,5 +267,9 @@ public:
 			command->execute();
 		else
 			std::cout << "No command set!\n";
+	}
+
+	std::string getResult() {
+		return command->getResult();
 	}
 };
