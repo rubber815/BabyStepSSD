@@ -11,26 +11,140 @@
 
 #define APP_NAME "ssd "
 
+const int MIN_LBA = 0;
+const int MAX_LBA = 99;
+const int VALUE_LENGTH = 10;
+const std::string PREFIX_VALUE = "0x";
+
+void checkLbaRange(int lba) {
+	if (lba < MIN_LBA || lba > MAX_LBA)
+		throw std::invalid_argument("lba is incorrect");
+}
+
+void checkEraseSize(int size) {
+	if (size > 10)
+		throw std::invalid_argument("over size");
+}
+
+void checkValue(std::string value) {
+	if (value.length() != VALUE_LENGTH)
+		throw std::invalid_argument("VALUE has a maximum length of 10.");
+
+	if (value.substr(0, 2) != PREFIX_VALUE)
+		throw std::invalid_argument("VALUE must be entered as 0x in hexadecimal.");
+
+	for (int i = 2; i < value.length(); i++) {
+		if (!(value[i] >= '0' && value[i] <= '9')
+			&& !(value[i] >= 'A' && value[i] <= 'F'))
+			throw std::invalid_argument("VALUE can be entered from 0 to 9 or A to F.");
+	}
+}
+
 bool verifyCommandFormat(const std::string& command) {
-	std::string operation;
 	std::istringstream iss(command);
-	iss >> operation;
-	if (operation == "erase" ||
-		operation == "erase_range" ||
-		operation == "write" ||
-		operation == "read" ||
-		operation == "exit" ||
-		operation == "help" ||
-		operation == "fullwrite" ||
-		operation == "fullread" ||
-		operation == "testapp1" ||
-		operation == "testapp2") {
+	std::string op, lba, endlba, val, size;
+
+	iss >> op;
+
+	/*exit: terminate shell*/
+	if (op == "exit") {
+		return true;
+	}
+
+	/*help: print the usage for each command.*/
+	if (op == "help") {
+		return true;
+	}
+
+	/*RW op format verification*/
+	if (op == "fullwrite") {
+		iss >> val;
+		try {
+			checkValue(val);
+		}
+		catch (std::invalid_argument e) {
+			std::cout << e.what() << std::endl;
+			return false;
+		}
+		return true;
+	}
+
+	if (op == "fullread") {
+		// TODO: detail format check
+		return true;
+	}
+
+	if (op == "write") {
+		iss >> lba >> val;
+
+		try {
+			checkLbaRange(stoi(lba));
+			checkValue(val);
+		}
+		catch (std::exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	if (op == "read") {
+		iss >> lba;
+
+		try {
+			checkLbaRange(stoi(lba));
+		}
+		catch (std::exception e) {
+			return false;
+		}
+
+		return true;
+	}
+
+	if (op == "erase") {
+		iss >> lba;
+		iss >> size;
+
+		try {
+			checkLbaRange(stoi(lba));
+			checkLbaRange(stoi(lba) + stoi(size) - 1);
+			checkEraseSize(stoi(size));
+		}
+		catch (std::exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	if (op == "erase_range") {
+		iss >> lba;
+		iss >> endlba;
+
+		try {
+			checkLbaRange(stoi(lba));
+			checkLbaRange(stoi(endlba) - 1);
+			checkEraseSize(stoi(endlba) - stoi(lba));
+		}
+		catch (std::exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	/*Test App format verification*/
+	if (op == "testapp1") {
+		// TODO: detail format check
+		return true;
+	}
+
+	if (op == "testapp2") {
+		// TODO: detail format check
 		return true;
 	}
 
 	std::cout << "INVALID COMMAND" << std::endl;
 	return false;
 }
+
 
 void help() {
 	std::cout << std::endl;
