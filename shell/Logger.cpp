@@ -22,8 +22,7 @@ private:
 	std::ofstream latestLogFile;
 
 	static Logger* instance;
-	int count = 0; // 
-	
+
 	std::ostringstream logFile;
 	std::ostringstream compessionCandidateFile;
 
@@ -114,12 +113,6 @@ public:
 			if (latestLogFile.tellp() > 10240) {
 				recordLog(currentTimeInfo);
 			}
-
-			// TODO
-			/*  1. When "two" until_date_time.log files are created,
-					Compresses the oldest created log file.
-				2. Assuming you have used Compressed Library,
-					change only the file name from .log --> .zip.*/
 		}
 	}
 };
@@ -129,13 +122,4 @@ public:
 
 // Macro to simplify logging
 #define LOG_FUNCTION_CALL(Message) \
-    Logger::getInstance()->print(__FUNCTION__, Message)
-
-// Example usage
-// TODO: will be deleted
-//void someFunction() {
-//    //LOG_FUNCTION_CALL(__FUNCTION__);
-//    // Your function logic here
-//    LOG_FUNCTION_CALL(__func__, "Some message");
-//    // Your function logic here
-//}
+	Logger::getInstance()->print(__FUNCTION__, Message)
