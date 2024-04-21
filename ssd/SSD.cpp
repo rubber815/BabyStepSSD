@@ -197,3 +197,68 @@ private:
 		}
 	}
 };
+
+// Interface for Command
+class Command {
+public:
+	virtual ~Command() {}
+	virtual void execute() = 0;
+};
+
+// Concrete Command for Read operation
+class ReadCommand : public Command {
+private:
+	SSD* ssd;
+	int address;
+public:
+	ReadCommand(SSD* ssd, int address) : ssd(ssd), address(address) {}
+
+	void execute() override {
+		ssd->read(address);
+	}
+};
+
+// Concrete Command for Write operation
+class WriteCommand : public Command {
+private:
+	SSD* ssd;
+	int address;
+	std::string data;
+public:
+	WriteCommand(SSD* ssd, int address, const std::string& data) : ssd(ssd), address(address), data(data) {}
+
+	void execute() override {
+		ssd->write(address, data);
+	}
+};
+
+// Concrete Command for Erase operation
+class EraseCommand : public Command {
+private:
+	SSD* ssd;
+	int startAddress;
+	int endAddress;
+public:
+	EraseCommand(SSD* ssd, int startAddress, int endAddress) : ssd(ssd), startAddress(startAddress), endAddress(endAddress) {}
+
+	void execute() override {
+		ssd->erase(startAddress, endAddress);
+	}
+};
+
+// Invoker class
+class SSDInvoker {
+private:
+	Command* command;
+public:
+	void setCommand(Command* cmd) {
+		command = cmd;
+	}
+
+	void executeCommand() {
+		if (command)
+			command->execute();
+		else
+			std::cout << "No command set!\n";
+	}
+};
