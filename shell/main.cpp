@@ -84,24 +84,23 @@ bool erase_range(std::string startlba, std::string endlba) {
 
 bool write(std::string lba, std::string value) {
 	std::string str = makeSSDCommand("W", lba, value).c_str();
-	LOG_FUNCTION_CALL(__func__, str);
+	LOG_FUNCTION_CALL(str);
 	system(str.c_str());
 
 	return true;
 }
 bool read(std::string lba) {
 	std::string str = makeSSDCommand("R", lba, "").c_str();
-	LOG_FUNCTION_CALL(__func__, str);
+	LOG_FUNCTION_CALL(str);
 	system(str.c_str());
 
 	return true;
 }
 
 bool fullWrite(std::string value) {
-	LOG_FUNCTION_CALL(__func__, value);
+	LOG_FUNCTION_CALL(value);
 	for (int i = 0; i < 100; i++)
 		system(makeSSDCommand("W", std::to_string(i), value).c_str());
-
 	return false;
 }
 
@@ -122,7 +121,7 @@ std::string readFromResultFile() {
 }
 
 bool fullRead() {
-	LOG_FUNCTION_CALL(__func__, "");
+	LOG_FUNCTION_CALL("");
 
 	for (int i = 0; i < 100; i++) {
 		system(makeSSDCommand("R", std::to_string(i), "").c_str());
@@ -133,7 +132,7 @@ bool fullRead() {
 
 bool testApp1() {
 	const std::string input1 = "0xABCDEFAB";
-	LOG_FUNCTION_CALL(__func__, "Full Write: " + input1 + " + ReadCompare");
+	LOG_FUNCTION_CALL("Full Write: " + input1 + " + ReadCompare");
 
 	for (int lba = 0; lba < 100; lba++)
 		system(makeSSDCommand("W", std::to_string(lba), input1).c_str());
@@ -156,7 +155,7 @@ bool testApp2() {
 	const std::string value1 = "0xAAAABBBB";
 	const std::string value2 = "0x12345678";
 
-	LOG_FUNCTION_CALL(__func__, "Full Write: " + value1 + ", " + value2 + " + ReadCompare");
+	LOG_FUNCTION_CALL("Full Write: " + value1 + ", " + value2 + " + ReadCompare");
 
 	for (int i = 0; i < agingCnt; i++) {
 		for (int lba = 0; lba <= maxLba; lba++)
@@ -216,7 +215,7 @@ void doRunner(char* path) {
 }
 
 // Static member initialization
-FunctionCallLogger* FunctionCallLogger::instance = nullptr;
+Logger* Logger::instance = nullptr;
 
 int main(int argc, char* argv[]) {
 	// for Runner
