@@ -18,6 +18,7 @@ class Logger {
 private:
 	const std::string LOGGER_TIME_FORMAT = "[%y.%m.%d %H:%M:%S]";
 	const std::string LATEST_LOG_FILENAME = "latest.log"; // default file name: will be changed to date_time.log
+	const int MAX_LATEST_SIZE = 10240;
 
 	std::ofstream latestLogFile;
 

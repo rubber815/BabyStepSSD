@@ -308,8 +308,8 @@ int SSD::AddCmdWriteBuffer(std::string cmd, int lba, std::string argv3) {
 	}
 	else 
 		std::cout << "Failed to open file for reading." << std::endl;
-	
-	count = v.size();
+
+	count = (int)(v.size());
 
 	WriteDatatoWriteBuffer(v);
 
