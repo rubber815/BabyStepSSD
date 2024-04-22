@@ -3,9 +3,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "../ssd/INAND.cpp"
 #include <stdexcept>
 #include <unordered_map>
+
+#include "../ssd/INAND.cpp"
+#include "../ssd/SSD.hpp"
+
 
 class SSD {
 public:
@@ -31,7 +34,7 @@ public:
 
 		nand_->write(lba, value);
 	}
-	std::string read(int lba) {	
+	std::string read(int lba) {
 		try {
 			checkLbaRange(lba);
 		}
@@ -58,42 +61,36 @@ public:
 	}
 
 private:
-	INAND * nand_;
-
-	const int MIN_LBA = 0;
-	const int MAX_LBA = 99;
-	const int VALUE_LENGTH = 10;
-	const std::string PREFIX_VALUE = "0x";
-	const std::string RESULT_FILE_NAME = "result.txt";
+	INAND* nand_;
 
 	void checkLbaRange(int lba) {
 		if (lba < MIN_LBA || lba > MAX_LBA)
-			throw std::invalid_argument("lba is incorrect");
+			throw std::invalid_argument(ERR::INVALID_LBA);
 	}
 
 	void checkEraseSize(int size) {
 		if (size > 10)
-			throw std::invalid_argument("over size");
+			throw std::invalid_argument(ERR::OVER_ERASE_SIZE);
 	}
 
 	void checkValue(std::string value) {
 		if (value.length() != VALUE_LENGTH)
-			throw std::invalid_argument("VALUE has a maximum length of 10.");
+			throw std::invalid_argument(ERR::INVALID_VALUE_LENGTH);
 
 		if (value.substr(0, 2) != PREFIX_VALUE)
-			throw std::invalid_argument("VALUE must be entered as 0x in hexadecimal.");
+			throw std::invalid_argument(ERR::INVALID_VALUE_PREFIXGTH);
 
 		for (int i = 2; i < value.length(); i++) {
 			if (!(value[i] >= '0' && value[i] <= '9')
 				&& !(value[i] >= 'A' && value[i] <= 'F'))
-				throw std::invalid_argument("VALUE can be entered from 0 to 9 or A to F.");
+				throw std::invalid_argument(ERR::INVALID_VALUE_CHARACTER);
 		}
 	}
 
 	void writeToResultFile(std::string value) {
 		std::ofstream outputFile(RESULT_FILE_NAME);
 		if (!outputFile) {
-			std::cout << "Failed to open file for writing." << std::endl;
+			std::cout << ERR::OPEN_WRITING_FILE_FAIL << std::endl;
 		}
 		else {
 			outputFile << value << std::endl;
@@ -170,7 +167,7 @@ public:
 		if (command)
 			command->execute();
 		else
-			std::cout << "No command set!\n";
+			std::cout << ERR::NO_COMMAND_SET;
 	}
 
 	std::string getResult() {
