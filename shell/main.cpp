@@ -15,6 +15,8 @@ const int MIN_LBA = 0;
 const int MAX_LBA = 99;
 const int VALUE_LENGTH = 10;
 const std::string PREFIX_VALUE = "0x";
+const std::string RESULT_FILE_NAME = "result.txt";
+const std::string RUNNER_RESULT_FILE_NAME = "testResult.txt";
 
 void checkLbaRange(int lba) {
 	if (lba < MIN_LBA || lba > MAX_LBA)
@@ -218,9 +220,8 @@ bool fullWrite(std::string value) {
 	return false;
 }
 
-std::string readFromResultFile() {
-	const std::string RESULT_FILE_NAME = "result.txt";
-	std::ifstream inputFile(RESULT_FILE_NAME);
+std::string readFromResultFile(std::string fileName) {
+	std::ifstream inputFile(fileName);
 	std::string value;
 
 	if (!inputFile.is_open()) {
@@ -239,7 +240,7 @@ bool fullRead() {
 
 	for (int i = 0; i < 100; i++) {
 		system(makeSSDCommand("R", std::to_string(i), "").c_str());
-		std::cout << readFromResultFile() << std::endl;
+		std::cout << readFromResultFile(RESULT_FILE_NAME) << std::endl;
 	}
 	return false;
 }
@@ -255,7 +256,7 @@ bool testApp1() {
 		system(makeSSDCommand("R", std::to_string(lba), "").c_str());
 
 		// Compare
-		std::string read_val = readFromResultFile();
+		std::string read_val = readFromResultFile(RESULT_FILE_NAME);
 		if (read_val != input1)
 			return false;
 	}
@@ -302,8 +303,9 @@ void doRunner(char* path) {
 
 	while (!runnerFile.eof()) {
 		result = false;
-		
+
 		std::getline(runnerFile, funcName);
+
 		if (funcName == "testApp1") {
 			result = testApp1();
 		}
@@ -311,10 +313,10 @@ void doRunner(char* path) {
 			result = testApp2();
 		}
 		else {
-			if (_access(funcName.c_str(), 0) != -1) {
-				system(funcName.c_str());
+			system(funcName.c_str());
+			if (readFromResultFile(RUNNER_RESULT_FILE_NAME) == "Pass")
 				result = true;
-			}
+			remove(RUNNER_RESULT_FILE_NAME.c_str());
 		}
 		std::cout << funcName << " --- Run...";
 
