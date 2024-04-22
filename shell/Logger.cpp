@@ -103,7 +103,7 @@ void Logger::print(const std::string& functionName, const std::string& message) 
 		latestLogFile.flush();
 
 		// 10 KB = 10240 Bytes (in binary)
-		if (latestLogFile.tellp() > 10240) {
+		if (latestLogFile.tellp() > MAX_LATEST_SIZE) {
 			recordLog(currentTimeInfo);
 		}
 	}

@@ -130,6 +130,7 @@
   <ItemGroup>
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ShellCmd.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
