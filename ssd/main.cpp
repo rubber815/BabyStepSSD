@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "SSD.cpp"
+#include "SSD.hpp"
 #include "BabyStepNAND.cpp"
 
 std::unordered_map<std::string, SSD::Command> cmdMap = {
