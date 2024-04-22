@@ -39,8 +39,6 @@ int main(int argc, char* argv[]) {
 		break;
 	}
 
-	if (babyStepSSD.updateWriteBuffer(argv))
-		return 0;
 	invoker.executeCommand();
 
 	return 0;

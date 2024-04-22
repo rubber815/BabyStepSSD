@@ -31,6 +31,7 @@ public:
 		FLUSH,
 		INVALIDCMD
 	};
+	SSD();
 
 	void selectNAND(INAND* nand);
 
@@ -40,7 +41,7 @@ public:
 
 	void erase(int lba, int size);
 
-	bool updateWriteBuffer(char* argv[]);
+	bool updateWriteBuffer(std::string cmd, int lba, std::string argv3);
 
 	bool flushWriteBuffer(void);
 private:
@@ -54,7 +55,7 @@ private:
 
 	void writeToResultFile(std::string value);
 
-	int AddCmdWriteBuffer(char* argv[]);
+	int AddCmdWriteBuffer(std::string cmd, int lba, std::string argv3);
 
 	std::string readWriteBuffer(int lba);
 };
