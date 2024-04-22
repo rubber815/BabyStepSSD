@@ -57,3 +57,6 @@ public:
 // Macro to simplify logging
 #define LOG_FUNCTION_CALL(Message) \
 	Logger::getInstance()->print(__FUNCTION__, Message)
+
+#define LOG_SCREEN_MODE(mode) \
+	Logger::getInstance()->setScreenMode(mode)

@@ -25,6 +25,13 @@ void Logger::openNewLogFile() {
 	latestLogFile.open(LATEST_LOG_FILENAME, std::ios::app); // open new latest.log
 	if (!latestLogFile.is_open()) {
 		std::cerr << "Error: Unable to open new latest.log" << std::endl;
+
+		static Logger* instance;
+
+		std::ostringstream logFile;
+		std::ostringstream compessionCandidateFile;
+
+		bool screenMode = true;
 	}
 }
 
