@@ -244,6 +244,7 @@ bool fullRead(bool compare, std::string comp_val) {
 				return false;
 		}
 	}
+	return true;
 }
 
 bool testApp1() {
