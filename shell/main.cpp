@@ -10,11 +10,16 @@
 #include "Logger.hpp"
 #include "ShellCmd.cpp"
 
+#define LOGGER_TEST 0
+
 const int MIN_LBA = 0;
 const int VALUE_LENGTH = 10;
 
 const std::string PREFIX_VALUE = "0x";
 const std::string RUNNER_RESULT_FILE_NAME = "testResult.txt";
+
+// Static member initialization
+Logger* Logger::instance = nullptr;
 
 void checkLbaRange(int lba) {
 	if (lba < MIN_LBA || lba > MAX_LBA)
@@ -200,8 +205,9 @@ std::string makeSSDCommand(std::string cmd, std::string arg1, std::string arg2) 
 
 bool testApp1() {
 	const std::string input = "0xABCDEFAB";
-	LOG_FUNCTION_CALL("Full Write: " + input + " + ReadCompare");
 
+	LOG_FUNCTION_CALL("Full Write: " + input + " + ReadCompare");
+	
 	ShellCmdInvoker invoker;
 	std::istringstream iss(input);
 	invoker.setCommand(new ShellFullWriteCommand(iss));
@@ -284,9 +290,6 @@ void doRunner(char* path) {
 	LOG_SCREEN_MODE(true);
 }
 
-// Static member initialization
-Logger* Logger::instance = nullptr;
-
 int main(int argc, char* argv[]) {
 	// for Runner
 	if (argc > 1) {
@@ -294,7 +297,7 @@ int main(int argc, char* argv[]) {
 			return 0;
 
 		doRunner(argv[1]);
-
+		
 		return 0;
 	}
 
@@ -305,6 +308,17 @@ int main(int argc, char* argv[]) {
 		ShellCmdInvoker invoker;
 		std::cout << "Enter a command: "; std::getline(std::cin, command);
 
+#if (LOGGER_TEST == 1)
+		if (command == "loggertest") {
+			for (size_t i = 0; i < 1000; i++)
+			{
+				LOG_FUNCTION_CALL("Full Write: [0x0 ~ 0x5]: + ReadCompare");
+				LOG_FUNCTION_CALL("Full Read: [0x0 ~ 0x5]: + ReadCompare");
+				Sleep(100);
+			}
+			continue;
+		}
+#endif
 		if (!(verifyCommandFormat(command)))
 			continue;
 

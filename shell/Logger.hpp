@@ -23,6 +23,7 @@ private:
 	std::ofstream latestLogFile;
 
 	static Logger* instance;
+	int recordCount;
 	bool screenMode = true;
 	std::ostringstream logFile;
 	std::ostringstream compessionCandidateFile;
@@ -52,9 +53,6 @@ public:
 
 	void setScreenMode(bool mode);
 };
-
-// Static member initialization
-//FunctionCallLogger* FunctionCallLogger::instance = nullptr;
 
 // Macro to simplify logging
 #define LOG_FUNCTION_CALL(Message) \

@@ -18,6 +18,7 @@ that manages the log output by the test shell
 
 Logger::Logger() {
 	openNewLogFile();
+	recordCount = 0;
 }
 
 /* 1. ctor, 2. end of recordLog*/
@@ -46,12 +47,13 @@ void Logger::recordLog(const std::tm& timeinfo) {
 
 	logFile.clear();
 	logFile.str("");
-	logFile << "until_" << std::put_time(&timeinfo, "%y%m%d_%Hh_%Mm_%Ss") << ".log";
-	compessionCandidateFile << "until_" << std::put_time(&timeinfo, "%y%m%d_%Hh_%Mm_%Ss") << ".zip";
+	logFile << "until_" << std::put_time(&timeinfo, "%y%m%d_%Hh_%Mm_%Ss") << "_" << recordCount << ".log";
+	compessionCandidateFile << "until_" << std::put_time(&timeinfo, "%y%m%d_%Hh_%Mm_%Ss") << "_" << recordCount << ".zip";
+	recordCount++;
 
 	closeLogFile();
 
-	if (!std::rename(LATEST_LOG_FILENAME.c_str(), logFile.str().c_str())) {
+	if (std::rename(LATEST_LOG_FILENAME.c_str(), logFile.str().c_str())) {
 		std::cerr << "Error: Unable to record " + LATEST_LOG_FILENAME << std::endl;
 	}
 
@@ -61,7 +63,7 @@ void Logger::recordLog(const std::tm& timeinfo) {
 // Logger feature 2: Log compression rules
 /*from .log to .zip */
 void Logger::compressLog() {
-	if (!std::rename(logFile.str().c_str(), compessionCandidateFile.str().c_str())) {
+	if (std::rename(logFile.str().c_str(), compessionCandidateFile.str().c_str())) {
 		std::cerr << "Error: Unable to compress " + logFile.str() << std::endl;
 	}
 	compessionCandidateFile.clear();
