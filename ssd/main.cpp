@@ -10,6 +10,7 @@ std::unordered_map<std::string, SSD::Command> cmdMap = {
 	{"R", SSD::Command::READ},
 	{"W", SSD::Command::WRITE},
 	{"E", SSD::Command::ERASE},
+	{"F", SSD::Command::FLUSH},
 };
 
 int main(int argc, char* argv[]) {
@@ -31,10 +32,16 @@ int main(int argc, char* argv[]) {
 	case SSD::Command::ERASE:
 		invoker.setCommand(new EraseCommand(&babyStepSSD, std::atoi(argv[2]), std::atoi(argv[3])));
 		break;
+	case SSD::Command::FLUSH:
+		babyStepSSD.flushWriteBuffer();
+		//invoker.setCommand(new FlushCommand(&babyStepSSD, std::atoi(argv[2]), std::atoi(argv[3])));
+		break;
 	default:
 		break;
 	}
 
+	if (babyStepSSD.updateWriteBuffer(argv))
+		return 0;
 	invoker.executeCommand();
 
 	return 0;

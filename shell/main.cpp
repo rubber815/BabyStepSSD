@@ -74,6 +74,10 @@ bool verifyCommandFormat(const std::string& command) {
 		return true;
 	}
 
+	if (op == "flush") {
+		return true;
+	}
+
 	if (op == "write") {
 		iss >> lba >> val;
 
@@ -171,6 +175,8 @@ void help() {
 	std::cout << "*		format: write <LBA> <VALUE>" << std::endl;
 	std::cout << "* read: read from SSD" << std::endl;
 	std::cout << "*		format: read <LBA>" << std::endl;
+	std::cout << "* flush: execute all cmd & clear writebuffer" << std::endl;
+	std::cout << "*		format: flush" << std::endl;
 	std::cout << "* fullwrite: write from LBA numbers 0 to 99." << std::endl;
 	std::cout << "*		format: fullwrite <VALUE>" << std::endl;
 	std::cout << "* fullread: read from LBA numbers 0 to 99." << std::endl;
