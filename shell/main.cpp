@@ -362,6 +362,9 @@ int main(int argc, char* argv[]) {
 			else if (operation == "fullread") {
 				invoker.setCommand(new ShellFullReadCommand(false, ""));
 			}
+			else if (operation == "flush") {
+				invoker.setCommand(new ShellFlushCommand());
+			}
 			invoker.executeCommand();
 		}
 	}

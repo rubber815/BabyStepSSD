@@ -153,6 +153,18 @@ public:
 	}
 };
 
+class ShellFlushCommand : public ShellCmd {
+private:
+public:
+	ShellFlushCommand() {
+	}
+
+	void execute() override {
+		LOG_FUNCTION_CALL("F");
+		system(makeSSDCommand("F", "", "").c_str());
+	}
+};
+
 // Invoker class
 class ShellCmdInvoker {
 private:
