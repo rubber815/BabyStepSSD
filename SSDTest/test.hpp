@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
 
+#include "../ssd/BabyStepNAND.cpp"
+#include "../ssd/SSD.hpp"
+
 const std::string NORMAL_VALUE_ZERO = "0x00000000";
 const std::string NORMAL_VALUE_AAAABBBB = "0xAAAABBBB";
 const std::string NORMAL_VALUE_0000AAAA = "0x0000AAAA";
