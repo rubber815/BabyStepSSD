@@ -4,8 +4,8 @@
 
 #include <stdexcept>
 #include "../ssd/BabyStepNAND.cpp"
-#include "../ssd/SSD.hpp"
-#include "test.h"
+#include "../ssd/SSD.cpp"
+#include "test.hpp"
 
 using namespace testing;
 
