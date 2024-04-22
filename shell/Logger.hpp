@@ -22,7 +22,7 @@ private:
 	std::ofstream latestLogFile;
 
 	static Logger* instance;
-
+	bool screenMode = true;
 	std::ostringstream logFile;
 	std::ostringstream compessionCandidateFile;
 
@@ -49,6 +49,7 @@ public:
 	/* Output format: [date time] function()         : log message */
 	void print(const std::string& functionName, const std::string& message);
 
+	void setScreenMode(bool mode);
 };
 
 // Static member initialization

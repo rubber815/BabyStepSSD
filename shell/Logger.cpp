@@ -111,3 +111,7 @@ void Logger::print(const std::string& functionName, const std::string& message) 
 		}
 	}
 }
+
+void Logger::setScreenMode(bool mode) {
+	screenMode = mode;
+}
