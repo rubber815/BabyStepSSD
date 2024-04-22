@@ -5,9 +5,18 @@
 #include <sstream>
 #include "../ssd/INAND.cpp"
 #include <stdexcept>
+#include <unordered_map>
 
 class SSD {
 public:
+	enum class Command
+	{
+		READ = 0,
+		WRITE,
+		ERASE,
+		INVALIDCMD
+	};
+
 	void selectNAND(INAND* nand) {
 		nand_ = nand;
 	}

@@ -6,31 +6,36 @@
 #include "SSD.cpp"
 #include "BabyStepNAND.cpp"
 
+std::unordered_map<std::string, SSD::Command> cmdMap = {
+	{"R", SSD::Command::READ},
+	{"W", SSD::Command::WRITE},
+	{"E", SSD::Command::ERASE},
+};
+
 int main(int argc, char* argv[]) {
-    std::string cmd = argv[1];
+	SSD babyStepSSD;
+	BabyStepNand babyStepNand;
+	babyStepSSD.selectNAND(&babyStepNand);
 
-    SSD babyStepSSD;
-    BabyStepNand babyStepNand;
-    babyStepSSD.selectNAND(&babyStepNand);
-    
-    SSDInvoker invoker;
+	SSDInvoker invoker;
 
-    if (cmd == "R") {
-        int address = std::atoi(argv[2]);
-        invoker.setCommand(new ReadCommand(&babyStepSSD, address));
-    } 
-    else if (cmd == "W") {
-        int address = std::atoi(argv[2]);
-        std::string data = argv[3];
-        invoker.setCommand(new WriteCommand(&babyStepSSD, address, data));
-    }
-    else if (cmd == "E") {
-        int startAddress = std::atoi(argv[2]);
-        int endAddress = std::atoi(argv[3]);
-        invoker.setCommand(new EraseCommand(&babyStepSSD, startAddress, endAddress));
-    }
+	std::string cmd = argv[1];
+	switch (cmdMap[cmd])
+	{
+	case SSD::Command::READ:
+		invoker.setCommand(new ReadCommand(&babyStepSSD, std::atoi(argv[2])));
+		break;
+	case SSD::Command::WRITE:
+		invoker.setCommand(new WriteCommand(&babyStepSSD, std::atoi(argv[2]), argv[3]));
+		break;
+	case SSD::Command::ERASE:
+		invoker.setCommand(new EraseCommand(&babyStepSSD, std::atoi(argv[2]), std::atoi(argv[3])));
+		break;
+	default:
+		break;
+	}
 
-    invoker.executeCommand();
+	invoker.executeCommand();
 
-    return 0;
+	return 0;
 }
