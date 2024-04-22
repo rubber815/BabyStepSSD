@@ -295,11 +295,12 @@ void doRunner(char* path) {
 	std::string funcName;
 	std::ifstream runnerFile(path);
 
+	LOG_SCREEN_MODE(false);
 	while (!runnerFile.eof()) {
 		result = false;
-
 		std::getline(runnerFile, funcName);
 
+		std::cout << funcName << " --- Run...";
 		if (funcName == "testApp1") {
 			result = testApp1();
 		}
@@ -312,7 +313,6 @@ void doRunner(char* path) {
 				result = true;
 			remove(RUNNER_RESULT_FILE_NAME.c_str());
 		}
-		std::cout << funcName << " --- Run...";
 
 		if (result) {
 			std::cout << "Pass" << std::endl;
@@ -322,6 +322,7 @@ void doRunner(char* path) {
 			break;
 		}
 	}
+	LOG_SCREEN_MODE(true);
 }
 
 // Static member initialization

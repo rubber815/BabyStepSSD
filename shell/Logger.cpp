@@ -26,6 +26,8 @@ private:
 	std::ostringstream logFile;
 	std::ostringstream compessionCandidateFile;
 
+	bool screenMode = true;
+
 	Logger() {
 		openNewLogFile();
 	}
@@ -102,7 +104,8 @@ public:
 
 			// Log function call with time information
 			/* When the screen is output, the print function writes the file simultaneously.*/
-			std::cout << timeInfoPrefix << " " << functionName << "() : " << message << std::endl; // screen print
+			if (screenMode)
+				std::cout << timeInfoPrefix << " " << functionName << "() : " << message << std::endl; // screen print
 			latestLogFile << timeInfoPrefix << " " << functionName << "() : " << message << std::endl; // latest.log file write
 
 			// Check logfile size and change filename if necessary
@@ -115,6 +118,10 @@ public:
 			}
 		}
 	}
+
+	void setScreenMode(bool mode) {
+		screenMode = mode;
+	}
 };
 
 // Static member initialization
@@ -123,3 +130,6 @@ public:
 // Macro to simplify logging
 #define LOG_FUNCTION_CALL(Message) \
 	Logger::getInstance()->print(__FUNCTION__, Message)
+
+#define LOG_SCREEN_MODE(mode) \
+	Logger::getInstance()->setScreenMode(mode)
