@@ -33,8 +33,7 @@ int main(int argc, char* argv[]) {
 		invoker.setCommand(new EraseCommand(&babyStepSSD, std::atoi(argv[2]), std::atoi(argv[3])));
 		break;
 	case SSD::Command::FLUSH:
-		babyStepSSD.flushWriteBuffer();
-		//invoker.setCommand(new FlushCommand(&babyStepSSD, std::atoi(argv[2]), std::atoi(argv[3])));
+		invoker.setCommand(new FlushCommand(&babyStepSSD));
 		break;
 	default:
 		break;

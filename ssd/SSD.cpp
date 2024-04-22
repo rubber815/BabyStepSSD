@@ -67,8 +67,12 @@ std::string SSD::read(int lba) {
 		return "";
 	}
 
-	std::string value = nand_->read(lba);
-	writeToResultFile(value);
+	std::string value = readWriteBuffer(lba);
+	if (value == "FAIL") {
+		value = nand_->read(lba);
+		writeToResultFile(value);
+	}
+
 	return value;
 }
 
@@ -89,21 +93,17 @@ void SSD::erase(int lba, int size) {
 bool SSD::updateWriteBuffer(char* argv[]) {
 	int count = 0;
 	std::string cmd = argv[1];
-	if (cmd == "R") {
-		return ReadWriteBuffer(argv);
-	}
-	else if (cmd == "F") {
-		while (flushWriteBuffer() == false);
-		return true;
-	}
-	else {
+	
+	if ((cmd == "W") || (cmd == "E")) {
 		count = AddCmdWriteBuffer(argv);
 		if (count == -1) return false;
 		if (count == 10) {
 			while (flushWriteBuffer() == false);
 		}
+
+		return true;
 	}
-	return true;
+	return false;
 }
 
 bool SSD::flushWriteBuffer(void) {
@@ -149,12 +149,9 @@ bool SSD::flushWriteBuffer(void) {
 	return true;
 }
 
-bool SSD::ReadWriteBuffer(char* argv[]) {
-
-	std::string str_argv2(argv[2]);
-	std::string return_data = "FAIL";
-
+std::string SSD::readWriteBuffer(int lba) {
 	int count;
+	std::string return_data = "FAIL";
 	std::ifstream readFromWriteBuffer;
 	readFromWriteBuffer.open(WRITE_BUFFER_FILE_NAME);
 
@@ -170,30 +167,22 @@ bool SSD::ReadWriteBuffer(char* argv[]) {
 			readFromWriteBuffer >> old_arg3;
 
 			if (old_cmd == "W") {
-				if (old_lba == stoi(str_argv2)) {
+				if (old_lba == lba) {
 					return_data = old_arg3;
 				}
 			}
 			else if (old_cmd == "E") {
-				if ((old_lba <= stoi(str_argv2)) && ((old_lba + stoi(old_arg3)) > stoi(str_argv2))) {
+				if ((old_lba <= lba) && ((old_lba + stoi(old_arg3)) > lba)) {
 					return_data = "0x00000000";
 				}
 			}
 		}
 		readFromWriteBuffer.close();
-
-		if (return_data != "FAIL") {
-			writeToResultFile(return_data);
-		}
-		else
-			return false;
 	}
-	else {
+	else
 		std::cout << "Failed to open file for reading." << std::endl;
-		return false;
-	}
 
-	return true;
+	return return_data;
 }
 
 int SSD::AddCmdWriteBuffer(char* argv[]) {
@@ -242,7 +231,8 @@ int SSD::AddCmdWriteBuffer(char* argv[]) {
 			else if (old_cmd == "E") {
 				// new command : write
 				if (str_argv1 == "W") {
-					// erase after write : nothing to do
+					// erase after write
+					v.push_back(tmp);
 				}
 				// new command : erase
 				else if (str_argv1 == "E") {
@@ -346,6 +336,13 @@ EraseCommand::EraseCommand(SSD* ssd, int startAddress, int endAddress)
 
 void EraseCommand::execute() {
 	ssd->erase(startAddress, endAddress);
+}
+
+FlushCommand::FlushCommand(SSD* ssd)
+	: ssd(ssd) {}
+
+void FlushCommand::execute() {
+	ssd->flushWriteBuffer();
 }
 
 void SSDInvoker::setCommand(Command* cmd) {

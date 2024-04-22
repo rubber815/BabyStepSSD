@@ -56,7 +56,7 @@ private:
 
 	int AddCmdWriteBuffer(char* argv[]);
 
-	bool ReadWriteBuffer(char* argv[]);
+	std::string readWriteBuffer(int lba);
 };
 
 // Interface for Command
@@ -102,6 +102,16 @@ private:
 	int endAddress;
 public:
 	EraseCommand(SSD* ssd, int startAddress, int endAddress);
+
+	void execute() override;
+};
+
+// Concrete Command for Erase operation
+class FlushCommand : public Command {
+private:
+	SSD* ssd;
+public:
+	FlushCommand(SSD* ssd);
 
 	void execute() override;
 };
