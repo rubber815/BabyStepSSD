@@ -147,6 +147,17 @@ bool verifyCommandFormat(const std::string& command) {
 	return false;
 }
 
+std::string readFromResultFile(std::string fileName) {
+	std::ifstream inputFile(fileName);
+	std::string value;
+	if (!inputFile.is_open()) {
+		std::cout << "Failed to open file for reading." << std::endl;
+		return value;
+	}
+	std::getline(inputFile, value);
+	inputFile.close();
+	return value;
+}
 
 void help() {
 	std::cout << std::endl;
@@ -213,55 +224,34 @@ bool read(std::string lba) {
 	return true;
 }
 
-bool fullWrite(std::string value) {
+void fullWrite(std::string value) {
 	LOG_FUNCTION_CALL(value);
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < (MAX_LBA + 1); i++)
 		system(makeSSDCommand("W", std::to_string(i), value).c_str());
-	return false;
 }
 
-std::string readFromResultFile(std::string fileName) {
-	std::ifstream inputFile(fileName);
-	std::string value;
-
-	if (!inputFile.is_open()) {
-		std::cout << "Failed to open file for reading." << std::endl;
-		return value;
-	}
-	std::getline(inputFile, value);
-
-	inputFile.close();
-	return value;
-
-}
-
-bool fullRead() {
+bool fullRead(bool compare, std::string comp_val) {
 	LOG_FUNCTION_CALL("");
 
-	for (int i = 0; i < 100; i++) {
-		system(makeSSDCommand("R", std::to_string(i), "").c_str());
-		std::cout << readFromResultFile(RESULT_FILE_NAME) << std::endl;
+	for (int lba = 0; lba < (MAX_LBA + 1); lba++) {
+		system(makeSSDCommand("R", std::to_string(lba), "").c_str());
+
+		std::string read_val = readFromResultFile(RESULT_FILE_NAME);
+		std::cout << read_val << std::endl;
+
+		if (compare) {
+			if (read_val != comp_val)
+				return false;
+		}
 	}
-	return false;
 }
 
 bool testApp1() {
-	const std::string input1 = "0xABCDEFAB";
-	LOG_FUNCTION_CALL("Full Write: " + input1 + " + ReadCompare");
+	const std::string input = "0xABCDEFAB";
+	LOG_FUNCTION_CALL("Full Write: " + input + " + ReadCompare");
 
-	for (int lba = 0; lba < 100; lba++)
-		system(makeSSDCommand("W", std::to_string(lba), input1).c_str());
-
-	for (int lba = 0; lba < 100; lba++) {
-		system(makeSSDCommand("R", std::to_string(lba), "").c_str());
-
-		// Compare
-		std::string read_val = readFromResultFile(RESULT_FILE_NAME);
-		if (read_val != input1)
-			return false;
-	}
-
-	return true;
+	fullWrite(input);
+	return fullRead(true, input);
 }
 
 bool testApp2() {
@@ -270,18 +260,22 @@ bool testApp2() {
 	const std::string value1 = "0xAAAABBBB";
 	const std::string value2 = "0x12345678";
 
-	LOG_FUNCTION_CALL("Full Write: " + value1 + ", " + value2 + " + ReadCompare");
+	LOG_FUNCTION_CALL("Full Write: [0x0 ~ 0x5]: " + value1 + ", " + value2 + " + ReadCompare");
 
 	for (int i = 0; i < agingCnt; i++) {
 		for (int lba = 0; lba <= maxLba; lba++)
 			system(makeSSDCommand("W", std::to_string(lba), value1).c_str());
 	}
-
-	for (int lba = 0; lba <= maxLba; lba++)
+	for (int lba = 0; lba <= maxLba; lba++) // Over Write
 		system(makeSSDCommand("W", std::to_string(lba), value2).c_str());
 
-	for (int lba = 0; lba <= maxLba; lba++)
+	// Read + Compare
+	for (int lba = 0; lba <= maxLba; lba++) {
 		system(makeSSDCommand("R", std::to_string(lba), "").c_str());
+		std::string read_val = readFromResultFile(RESULT_FILE_NAME);
+		if (read_val != value2)
+			return false;
+	}
 
 	return true;
 }
@@ -336,11 +330,11 @@ Logger* Logger::instance = nullptr;
 int main(int argc, char* argv[]) {
 	// for Runner
 	if (argc > 1) {
-		if (!isValidFilePath(argv[1])) {
+		if (!isValidFilePath(argv[1]))
 			return 0;
-		}
+
 		doRunner(argv[1]);
-			
+
 		return 0;
 	}
 
@@ -390,11 +384,11 @@ int main(int argc, char* argv[]) {
 			read(lba);
 		}
 		else if (operation == "fullwrite") {
-			iss >> value;	
+			iss >> value;
 			fullWrite(value);
 		}
 		else if (operation == "fullread") {
-			fullRead();
+			fullRead(false, "");
 		}
 		/*TestApp commands*/
 		else if (operation == "testapp1") {
@@ -403,12 +397,11 @@ int main(int argc, char* argv[]) {
 			else
 				std::cout << "testapp1: Compare Fail!" << std::endl;
 		}
-		else if (operation == "testapp2")
-			testApp2();
-
-		// for reference: Execute the .exe file
-		//system("ssd W 1 0x11111111");
-		//system("ssd W 2 0x22222222");
-		//system("ssd R 1");
+		else if (operation == "testapp2") {
+			if (testApp2())
+				std::cout << "testapp2: Compare Success!" << std::endl;
+			else
+				std::cout << "testapp2: Compare Fail!" << std::endl;
+		}
 	}
 }
