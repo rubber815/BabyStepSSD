@@ -4,87 +4,79 @@
 #include <fstream>
 #include <vector>
 
-#define NAND_FILE "nand.txt"
-#define NAND_DEFAULT_VALUE "0x00000000"
-#define NAND_LBA_COUNT 100
+#include "BabyStepNAND.hpp"
 
-class BabyStepNand : public INAND {
-public:
-	BabyStepNand() {
-		if (readAllNand() == false) {
-			for (int i = 0; i < NAND_LBA_COUNT; i++)
-				m_buffer.push_back(NAND_DEFAULT_VALUE);
-
-			writeAllNand();
-		}
-	}
-
-	void erase(int lba, int size) override {
-		readAllNand();
-
-		for (int i = 0; i < size; i++) {
-			m_buffer[lba + i] = NAND_DEFAULT_VALUE;
-		}
+BabyStepNand::BabyStepNand() {
+	if (readAllNand() == false) {
+		for (int i = 0; i < NAND_LBA_COUNT; i++)
+			m_buffer.push_back(NAND_DEFAULT_VALUE);
 
 		writeAllNand();
 	}
+}
 
-	void write(int lba, std::string value) override {
-		readAllNand();
+void BabyStepNand::erase(int lba, int size) {
+	readAllNand();
 
-		// Modify NAND data
-		m_buffer[lba] = value;
-
-		writeAllNand();
+	for (int i = 0; i < size; i++) {
+		m_buffer[lba + i] = NAND_DEFAULT_VALUE;
 	}
 
-	std::string read(int lba) override {
-		readAllNand();
+	writeAllNand();
+}
 
-		// Read NAND data
-		std::string data{ m_buffer[lba] };
+void BabyStepNand::write(int lba, std::string value) {
+	readAllNand();
 
-		return data;
-	}
+	// Modify NAND data
+	m_buffer[lba] = value;
 
-private:
-	std::vector<std::string> m_buffer;
+	writeAllNand();
+}
 
-	bool readAllNand() {
-		std::ifstream readFromNand;
-		readFromNand.open(NAND_FILE);
+std::string BabyStepNand::read(int lba) {
+	readAllNand();
 
-		if (readFromNand.is_open()) {
-			m_buffer.clear();
+	// Read NAND data
+	std::string data{ m_buffer[lba] };
 
-			while (!readFromNand.eof()) {
-				std::string tmp;
-				getline(readFromNand, tmp);
-				m_buffer.push_back(tmp);
-			}
+	return data;
+}
+
+bool BabyStepNand::readAllNand() {
+	std::ifstream readFromNand;
+	readFromNand.open(NAND_FILE);
+
+	if (readFromNand.is_open()) {
+		m_buffer.clear();
+
+		while (!readFromNand.eof()) {
+			std::string tmp;
+			getline(readFromNand, tmp);
+			m_buffer.push_back(tmp);
 		}
-		else
-		{
-			return false;
-		}
-
-		readFromNand.close();
-		return true;
+	}
+	else
+	{
+		return false;
 	}
 
-	void writeAllNand() {
-		std::ofstream writeToNand;
-		writeToNand.open(NAND_FILE);
+	readFromNand.close();
+	return true;
+}
 
-		int len = static_cast<int>(m_buffer.size());
-		for (int i = 0; i < len; i++) {
-			std::string tmp = m_buffer[i];
-			if (i != len - 1) {
-				tmp += "\n";
-			}
-			writeToNand.write(tmp.c_str(), tmp.size());
+void BabyStepNand::writeAllNand() {
+	std::ofstream writeToNand;
+	writeToNand.open(NAND_FILE);
+
+	int len = static_cast<int>(m_buffer.size());
+	for (int i = 0; i < len; i++) {
+		std::string tmp = m_buffer[i];
+		if (i != len - 1) {
+			tmp += "\n";
 		}
-
-		writeToNand.close();
+		writeToNand.write(tmp.c_str(), tmp.size());
 	}
-};
+
+	writeToNand.close();
+}

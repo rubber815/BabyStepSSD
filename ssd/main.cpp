@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "SSD.cpp"
-#include "BabyStepNAND.cpp"
+#include "BabyStepNAND.hpp"
 
 std::unordered_map<std::string, SSD::Command> cmdMap = {
 	{"R", SSD::Command::READ},
