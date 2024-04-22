@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Write10AndCompare", "Write1
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Loop_WriteAndReadCompare", "Loop_WriteAndReadCompare\Loop_WriteAndReadCompare.vcxproj", "{DF73792B-B154-4F6C-AEC7-3D4D16B8EC3C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Write10AndCompareFail", "Write10AndCompareFail\Write10AndCompareFail.vcxproj", "{B6F37F24-7C15-4BA5-B257-FF876B32CB53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -87,6 +89,14 @@ Global
 		{DF73792B-B154-4F6C-AEC7-3D4D16B8EC3C}.Release|x64.Build.0 = Release|x64
 		{DF73792B-B154-4F6C-AEC7-3D4D16B8EC3C}.Release|x86.ActiveCfg = Release|Win32
 		{DF73792B-B154-4F6C-AEC7-3D4D16B8EC3C}.Release|x86.Build.0 = Release|Win32
+		{B6F37F24-7C15-4BA5-B257-FF876B32CB53}.Debug|x64.ActiveCfg = Debug|x64
+		{B6F37F24-7C15-4BA5-B257-FF876B32CB53}.Debug|x64.Build.0 = Debug|x64
+		{B6F37F24-7C15-4BA5-B257-FF876B32CB53}.Debug|x86.ActiveCfg = Debug|Win32
+		{B6F37F24-7C15-4BA5-B257-FF876B32CB53}.Debug|x86.Build.0 = Debug|Win32
+		{B6F37F24-7C15-4BA5-B257-FF876B32CB53}.Release|x64.ActiveCfg = Release|x64
+		{B6F37F24-7C15-4BA5-B257-FF876B32CB53}.Release|x64.Build.0 = Release|x64
+		{B6F37F24-7C15-4BA5-B257-FF876B32CB53}.Release|x86.ActiveCfg = Release|Win32
+		{B6F37F24-7C15-4BA5-B257-FF876B32CB53}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
