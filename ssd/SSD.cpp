@@ -231,7 +231,8 @@ int SSD::AddCmdWriteBuffer(char* argv[]) {
 			else if (old_cmd == "E") {
 				// new command : write
 				if (str_argv1 == "W") {
-					// erase after write : nothing to do
+					// erase after write
+					v.push_back(tmp);
 				}
 				// new command : erase
 				else if (str_argv1 == "E") {
