@@ -33,7 +33,7 @@ public:
 	};
 	SSD();
 
-	void initializeWriteBuffer(void);
+	void WriteDatatoWriteBuffer(std::vector<std::string> data);
 
 	void selectNAND(INAND* nand);
 
