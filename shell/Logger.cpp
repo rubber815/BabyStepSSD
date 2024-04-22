@@ -25,13 +25,6 @@ void Logger::openNewLogFile() {
 	latestLogFile.open(LATEST_LOG_FILENAME, std::ios::app); // open new latest.log
 	if (!latestLogFile.is_open()) {
 		std::cerr << "Error: Unable to open new latest.log" << std::endl;
-
-		static Logger* instance;
-
-		std::ostringstream logFile;
-		std::ostringstream compessionCandidateFile;
-
-		bool screenMode = true;
 	}
 }
 
@@ -50,15 +43,17 @@ void Logger::recordLog(const std::tm& timeinfo) {
 	if (compessionCandidateFile.str() != "") {
 		compressLog();
 	}
+
 	logFile.clear();
 	logFile.str("");
-	//std::cout << "[Logger]: " << logFile.str() << " is created!" << std::endl;
 	logFile << "until_" << std::put_time(&timeinfo, "%y%m%d_%Hh_%Mm_%Ss") << ".log";
 	compessionCandidateFile << "until_" << std::put_time(&timeinfo, "%y%m%d_%Hh_%Mm_%Ss") << ".zip";
-	//std::cout << "[Logger]: " << recordFile.str() << " is created!" << std::endl; // TODO : will be removed
+
 	closeLogFile();
 
-	std::rename(LATEST_LOG_FILENAME.c_str(), logFile.str().c_str()); // date log created!!
+	if (!std::rename(LATEST_LOG_FILENAME.c_str(), logFile.str().c_str())) {
+		std::cerr << "Error: Unable to record " + LATEST_LOG_FILENAME << std::endl;
+	}
 
 	openNewLogFile();
 }
@@ -66,7 +61,9 @@ void Logger::recordLog(const std::tm& timeinfo) {
 // Logger feature 2: Log compression rules
 /*from .log to .zip */
 void Logger::compressLog() {
-	std::rename(logFile.str().c_str(), compessionCandidateFile.str().c_str());
+	if (!std::rename(logFile.str().c_str(), compessionCandidateFile.str().c_str())) {
+		std::cerr << "Error: Unable to compress " + logFile.str() << std::endl;
+	}
 	compessionCandidateFile.clear();
 	compessionCandidateFile.str("");
 }
@@ -98,13 +95,13 @@ void Logger::print(const std::string& functionName, const std::string& message) 
 
 		// Log function call with time information
 		/* When the screen is output, the print function writes the file simultaneously.*/
-		std::cout << timeInfoPrefix << " " << functionName << "() : " << message << std::endl; // screen print
+		if (screenMode)
+			std::cout << timeInfoPrefix << " " << functionName << "() : " << message << std::endl; // screen print
 		latestLogFile << timeInfoPrefix << " " << functionName << "() : " << message << std::endl; // latest.log file write
 
 		// Check logfile size and change filename if necessary
 		latestLogFile.flush();
 
-		//std::cout << "Size: " << latestLogFile.tellp() << std::endl;
 		// 10 KB = 10240 Bytes (in binary)
 		if (latestLogFile.tellp() > 10240) {
 			recordLog(currentTimeInfo);
