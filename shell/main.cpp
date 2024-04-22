@@ -15,6 +15,8 @@ const int MIN_LBA = 0;
 const int MAX_LBA = 99;
 const int VALUE_LENGTH = 10;
 const std::string PREFIX_VALUE = "0x";
+const std::string RESULT_FILE_NAME = "result.txt";
+const std::string RUNNER_RESULT_FILE_NAME = "testResult.txt";
 
 void checkLbaRange(int lba) {
 	if (lba < MIN_LBA || lba > MAX_LBA)
@@ -145,20 +147,16 @@ bool verifyCommandFormat(const std::string& command) {
 	return false;
 }
 
-std::string readFromResultFile() {
-	const std::string RESULT_FILE_NAME = "result.txt";
-	std::ifstream inputFile(RESULT_FILE_NAME);
+std::string readFromResultFile(std::string fileName) {
+	std::ifstream inputFile(fileName);
 	std::string value;
-
 	if (!inputFile.is_open()) {
 		std::cout << "Failed to open file for reading." << std::endl;
 		return value;
 	}
 	std::getline(inputFile, value);
-
 	inputFile.close();
 	return value;
-
 }
 
 void help() {
@@ -238,7 +236,7 @@ bool fullRead(bool compare, std::string comp_val) {
 	for (int lba = 0; lba < (MAX_LBA + 1); lba++) {
 		system(makeSSDCommand("R", std::to_string(lba), "").c_str());
 
-		std::string read_val = readFromResultFile();
+		std::string read_val = readFromResultFile(RESULT_FILE_NAME);
 		std::cout << read_val << std::endl;
 
 		if (compare) {
@@ -246,7 +244,6 @@ bool fullRead(bool compare, std::string comp_val) {
 				return false;
 		}
 	}
-	return true;
 }
 
 bool testApp1() {
@@ -275,7 +272,7 @@ bool testApp2() {
 	// Read + Compare
 	for (int lba = 0; lba <= maxLba; lba++) {
 		system(makeSSDCommand("R", std::to_string(lba), "").c_str());
-		std::string read_val = readFromResultFile();
+		std::string read_val = readFromResultFile(RESULT_FILE_NAME);
 		if (read_val != value2)
 			return false;
 	}
@@ -302,6 +299,7 @@ void doRunner(char* path) {
 		result = false;
 
 		std::getline(runnerFile, funcName);
+
 		if (funcName == "testApp1") {
 			result = testApp1();
 		}
@@ -309,10 +307,10 @@ void doRunner(char* path) {
 			result = testApp2();
 		}
 		else {
-			if (_access(funcName.c_str(), 0) != -1) {
-				system(funcName.c_str());
+			system(funcName.c_str());
+			if (readFromResultFile(RUNNER_RESULT_FILE_NAME) == "Pass")
 				result = true;
-			}
+			remove(RUNNER_RESULT_FILE_NAME.c_str());
 		}
 		std::cout << funcName << " --- Run...";
 
