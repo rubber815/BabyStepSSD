@@ -26,8 +26,8 @@ int main(int argc, char* argv[]) {
     if (cmd == "E")
         babyStepSSD.erase(atoi(argv[2]), atoi(argv[3]));
 
-    /*if (cmd == "F")
-        babyStepSSD.flushWriteBuffer();*/
+    if (cmd == "F")
+        babyStepSSD.flushWriteBuffer();
 
     return 0;
 }

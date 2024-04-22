@@ -15,6 +15,7 @@ bool verifyCommandFormat(const std::string& command) {
 		operation == "read" ||
 		operation == "exit" ||
 		operation == "help" ||
+		operation == "flush" ||
 		operation == "fullwrite" ||
 		operation == "fullread" ||
 		operation == "testapp1" ||
@@ -40,6 +41,8 @@ void help() {
 	std::cout << "*		format: write <LBA> <VALUE>" << std::endl;
 	std::cout << "* read: read from SSD" << std::endl;
 	std::cout << "*		format: read <LBA>" << std::endl;
+	std::cout << "* flush: execute all cmd & clear writebuffer" << std::endl;
+	std::cout << "*		format: flush" << std::endl;
 	std::cout << "* fullwrite: write from LBA numbers 0 to 99." << std::endl;
 	std::cout << "*		format: fullwrite <VALUE>" << std::endl;
 	std::cout << "* fullread: read from LBA numbers 0 to 99." << std::endl;
@@ -82,6 +85,10 @@ bool read(std::string lba) {
 	str = str + "R " + lba;
 
 	system(str.c_str());
+	return true;
+}
+bool flush() {
+	system("ssd F");
 	return true;
 }
 bool fullWrite(std::string value) {
@@ -267,6 +274,9 @@ int main(int argc, char* argv[]) {
 		else if (operation == "read") {
 			iss >> lba;
 			read(lba);
+		}
+		else if (operation == "flush") {
+			flush();
 		}
 		else if (operation == "fullwrite") {
 			iss >> value;	
