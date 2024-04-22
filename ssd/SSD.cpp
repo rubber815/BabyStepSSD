@@ -78,7 +78,7 @@ private:
 			throw std::invalid_argument(ERR::INVALID_VALUE_LENGTH);
 
 		if (value.substr(0, 2) != PREFIX_VALUE)
-			throw std::invalid_argument(ERR::INVALID_VALUE_PREFIXGTH);
+			throw std::invalid_argument(ERR::INVALID_VALUE_PREFIX);
 
 		for (int i = 2; i < value.length(); i++) {
 			if (!(value[i] >= '0' && value[i] <= '9')
