@@ -8,14 +8,12 @@
 #include <cstdlib> // For system() function
 #include <io.h>
 #include "Logger.hpp"
-
-#define APP_NAME "ssd "
+#include "ShellCmd.cpp"
 
 const int MIN_LBA = 0;
-const int MAX_LBA = 99;
 const int VALUE_LENGTH = 10;
+
 const std::string PREFIX_VALUE = "0x";
-const std::string RESULT_FILE_NAME = "result.txt";
 const std::string RUNNER_RESULT_FILE_NAME = "testResult.txt";
 
 void checkLbaRange(int lba) {
@@ -189,9 +187,8 @@ void help() {
 	std::cout << "***********************************" << std::endl;
 	std::cout << std::endl;
 }
-bool exit() {
+void exit() {
 	std::cout << "Exiting the program..." << std::endl;
-	return false;
 }
 
 std::string makeSSDCommand(std::string cmd, std::string arg1, std::string arg2) {
@@ -201,69 +198,19 @@ std::string makeSSDCommand(std::string cmd, std::string arg1, std::string arg2) 
 	return result;
 }
 
-bool erase(std::string lba, std::string size) {
-	system(makeSSDCommand("E", lba, size).c_str());
-
-	return true;
-}
-
-bool erase_range(std::string startlba, std::string endlba) {
-	int size = stoi(endlba) - stoi(startlba);
-
-	erase(startlba, std::to_string(size));
-
-	return true;
-}
-
-bool write(std::string lba, std::string value) {
-	std::string str = makeSSDCommand("W", lba, value).c_str();
-	LOG_FUNCTION_CALL(str);
-	system(str.c_str());
-
-	return true;
-}
-bool read(std::string lba) {
-	std::string str = makeSSDCommand("R", lba, "").c_str();
-	LOG_FUNCTION_CALL(str);
-	system(str.c_str());
-
-	return true;
-}
-
-void fullWrite(std::string value) {
-	LOG_FUNCTION_CALL(value);
-	for (int i = 0; i < (MAX_LBA + 1); i++)
-		system(makeSSDCommand("W", std::to_string(i), value).c_str());
-}
-
-bool fullRead(bool compare, std::string comp_val) {
-	LOG_FUNCTION_CALL("");
-
-	for (int lba = 0; lba < (MAX_LBA + 1); lba++) {
-		system(makeSSDCommand("R", std::to_string(lba), "").c_str());
-
-		std::string read_val = readFromResultFile(RESULT_FILE_NAME);
-		std::cout << read_val << std::endl;
-
-		if (compare) {
-			if (read_val != comp_val)
-				return false;
-		}
-	}
-	return true;
-}
-
-void flush(void) {
-	LOG_FUNCTION_CALL("");
-	system(makeSSDCommand("F", "", "").c_str());
-}
-
 bool testApp1() {
 	const std::string input = "0xABCDEFAB";
 	LOG_FUNCTION_CALL("Full Write: " + input + " + ReadCompare");
 
-	fullWrite(input);
-	return fullRead(true, input);
+	ShellCmdInvoker invoker;
+	std::istringstream iss(input);
+	invoker.setCommand(new ShellFullWriteCommand(iss));
+	invoker.executeCommand();
+
+	invoker.setCommand(new ShellFullReadCommand(true, input));
+	invoker.executeCommand();
+
+	return true;
 }
 
 bool testApp2() {
@@ -353,70 +300,72 @@ int main(int argc, char* argv[]) {
 
 	std::string command, operation, lba, endlba, value, size;
 
+	std::cout << "Welcome to ShellProgram!!" << std::endl;
 	while (true) {
-		std::cout << "Welcome to ShellProgram!!: "; // Updated prompt
-		std::getline(std::cin, command);
+		ShellCmdInvoker invoker;
+		std::cout << "Enter a command: "; std::getline(std::cin, command);
 
 		if (!(verifyCommandFormat(command)))
 			continue;
 
-		// parsing commands
+		// Parse operation in command
 		std::istringstream iss(command);
 		iss >> operation;
 
-		// Shell commands
-		if (operation == "exit") {
-			exit();
-			break;
+		// Shell general commands
+		{
+			if (operation == "exit") {
+				exit();
+				break;
+			}
+			else if (operation == "help") {
+				help();
+				continue;
+			}
 		}
 
-		if (operation == "help") {
-			help();
-			continue;
-		}
-
-		/*RW commands*/
-		if (operation == "erase") {
-			iss >> lba;
-			iss >> size;
-			erase(lba, size);
-		}
-		else if (operation == "erase_range") {
-			iss >> lba;
-			iss >> endlba;
-			erase_range(lba, endlba);
-		}
-		else if (operation == "write") {
-			iss >> lba;
-			iss >> value;
-			write(lba, value);
-		}
-		else if (operation == "read") {
-			iss >> lba;
-			read(lba);
-		}
-		else if (operation == "fullwrite") {
-			iss >> value;
-			fullWrite(value);
-		}
-		else if (operation == "fullread") {
-			fullRead(false, "");
-		}
-		else if (operation == "flush") {
-			flush();
-		}
 		/*TestApp commands*/
-		else if (operation == "testapp1") {
-			if (testApp1())
-				std::cout << "testapp1: Compare Success!" << std::endl;
-			else
-				std::cout << "testapp1: Compare Fail!" << std::endl;
+		{
+			if (operation == "testapp1") {
+				if (testApp1())
+					std::cout << "testapp1: Compare Success!" << std::endl;
+				else
+					std::cout << "testapp1: Compare Fail!" << std::endl;
+				continue;
+			}
+			else if (operation == "testapp2") {
+				if (testApp2())
+					std::cout << "testapp2: Compare Success!" << std::endl;
+				else
+					std::cout << "testapp2: Compare Fail!" << std::endl;
+				continue;
+			}
 		}
-		else if (operation == "testapp2") {
-			if (testApp2())
-				std::cout << "testapp2: Compare Success!" << std::endl;
-			else
-				std::cout << "testapp2: Compare Fail!" << std::endl;
+
+		/*R/W commands*/
+		{
+			if (operation == "erase") {
+				invoker.setCommand(new ShellEraseCommand(iss));
+			}
+			else if (operation == "erase_range") {
+				invoker.setCommand(new ShellEraseRangeCommand(iss));
+			}
+			else if (operation == "write") {
+				invoker.setCommand(new ShellWriteCommand(iss));
+			}
+			else if (operation == "read") {
+				invoker.setCommand(new ShellReadCommand(iss));
+			}
+			else if (operation == "fullwrite") {
+				invoker.setCommand(new ShellFullWriteCommand(iss));
+			}
+			else if (operation == "fullread") {
+				invoker.setCommand(new ShellFullReadCommand(false, ""));
+			}
+			else if (operation == "flush") {
+				invoker.setCommand(new ShellFlushCommand());
+			}
+			invoker.executeCommand();
 		}
 	}
 }

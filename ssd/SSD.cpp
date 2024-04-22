@@ -306,7 +306,7 @@ int SSD::AddCmdWriteBuffer(std::string cmd, int lba, std::string argv3) {
 		return -1;
 	}
 
-	count = v.size();
+	count = (int)(v.size());
 
 	std::ofstream outputFile(WRITE_BUFFER_FILE_NAME);
 	if (!outputFile) {
