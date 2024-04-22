@@ -5,7 +5,7 @@
 #include "../ssd/INAND.cpp"
 #include "../ssd/SSD.cpp"
 #include <stdexcept>
-#include "test.h"
+#include "test.hpp"
 
 using namespace testing;
 
@@ -108,117 +108,103 @@ public:
 };
 
 TEST_F(SSDCommandInvokerTest, Write_lba_test) {
-	EXPECT_CALL(m_nand_, write(0, "0x00000000"))
-		.Times(1);
+	EXPECT_CALL(m_nand_, write(NORMAL_LBA_ZERO, NORMAL_VALUE_ZERO))
+		.Times(CALLED_TIME_ONE);
 
-	int address = 0;
-	std::string data = "0x00000000";
-	invoker.setCommand(new WriteCommand(&ssd_, address, data));
+	invoker.setCommand(new WriteCommand(&ssd_, NORMAL_LBA_ZERO, NORMAL_VALUE_ZERO));
 
 	invoker.executeCommand();
 }
 
 TEST_F(SSDCommandInvokerTest, Write_lower_lba_fail_on_ssd_but_no_throw_test) {
-	EXPECT_CALL(m_nand_, write(-1, "0x00000000"))
-		.Times(0);
+	EXPECT_CALL(m_nand_, write(INVALID_LBA_UNDER_RANGE, NORMAL_VALUE_ZERO))
+		.Times(CALLED_TIME_ZERO);
 
-	int address = -1;
-	std::string data = "0x00000000";
-	invoker.setCommand(new WriteCommand(&ssd_, address, data));
+	invoker.setCommand(new WriteCommand(&ssd_, INVALID_LBA_UNDER_RANGE, NORMAL_VALUE_ZERO));
 
 	EXPECT_NO_THROW(invoker.executeCommand());
 }
 
 TEST_F(SSDCommandInvokerTest, Write_upper_lba_fail_on_ssd_but_no_throw_test) {
-	EXPECT_CALL(m_nand_, write(101, "0x00000000"))
-		.Times(0);
+	EXPECT_CALL(m_nand_, write(INVALID_LBA_OVER_RANGE, NORMAL_VALUE_ZERO))
+		.Times(CALLED_TIME_ZERO);
 
-	int address = 101;
-	std::string data = "0x00000000";
-	invoker.setCommand(new WriteCommand(&ssd_, address, data));
+	invoker.setCommand(new WriteCommand(&ssd_, INVALID_LBA_OVER_RANGE, NORMAL_VALUE_ZERO));
 
 	EXPECT_NO_THROW(invoker.executeCommand());
 }
 
 TEST_F(SSDCommandInvokerTest, Write_data_out_of_rang_fail_on_ssd_but_no_throw_test) {
-	EXPECT_CALL(m_nand_, write(0, "0x0000000000"))
-		.Times(0);
+	EXPECT_CALL(m_nand_, write(NORMAL_LBA_ZERO, INVALID_VALUE_ZERO_OVER_RANGE))
+		.Times(CALLED_TIME_ZERO);
 
-	int address = 0;
-	std::string data = "0x0000000000";
-	invoker.setCommand(new WriteCommand(&ssd_, address, data));
+	invoker.setCommand(new WriteCommand(&ssd_, NORMAL_LBA_ZERO, INVALID_VALUE_ZERO_OVER_RANGE));
 
 	EXPECT_NO_THROW(invoker.executeCommand());
 }
 
 TEST_F(SSDCommandInvokerTest, Write_data_prefix_fail_on_ssd_but_no_throw_test) {
-	EXPECT_CALL(m_nand_, write(0, "xx00000000"))
-		.Times(0);
+	EXPECT_CALL(m_nand_, write(NORMAL_LBA_ZERO, INVALID_VALUE_WRONG_PREFIX))
+		.Times(CALLED_TIME_ZERO);
 
-	int address = 0;
-	std::string data = "xx00000000";
-	invoker.setCommand(new WriteCommand(&ssd_, address, data));
+	invoker.setCommand(new WriteCommand(&ssd_, NORMAL_LBA_ZERO, INVALID_VALUE_WRONG_PREFIX));
 
 	EXPECT_NO_THROW(invoker.executeCommand());
 }
 
 TEST_F(SSDCommandInvokerTest, Read_test_normal_success) {
-	int testLBA1 = 0;
-	EXPECT_CALL(m_nand_, read(testLBA1))
-		.WillOnce(Return("0xAAAABBBB"));
+	EXPECT_CALL(m_nand_, read(NORMAL_LBA_ZERO))
+		.WillOnce(Return(NORMAL_VALUE_AAAABBBB));
 
-	invoker.setCommand(new ReadCommand(&ssd_, testLBA1));
+	invoker.setCommand(new ReadCommand(&ssd_, NORMAL_LBA_ZERO));
 	invoker.executeCommand();
 
-	EXPECT_THAT(invoker.getResult(), Eq("0xAAAABBBB"));
+	EXPECT_THAT(invoker.getResult(), Eq(NORMAL_VALUE_AAAABBBB));
 
-	int testLBA2 = 30;
-	EXPECT_CALL(m_nand_, read(testLBA2))
-		.WillOnce(Return("0x0000AAAA"));
-	invoker.setCommand(new ReadCommand(&ssd_, testLBA2));
+	EXPECT_CALL(m_nand_, read(NORMAL_LBA_30))
+		.WillOnce(Return(NORMAL_VALUE_0000AAAA));
+	invoker.setCommand(new ReadCommand(&ssd_, NORMAL_LBA_30));
 	invoker.executeCommand();
 
-	EXPECT_THAT(invoker.getResult(), Eq("0x0000AAAA"));
+	EXPECT_THAT(invoker.getResult(), Eq(NORMAL_VALUE_0000AAAA));
 }
 
 TEST_F(SSDCommandInvokerTest, Read_test_boundary_check_fail_on_ssd_but_no_throw_test) {
-	EXPECT_CALL(m_nand_, read(-1))
-		.Times(0);
+	EXPECT_CALL(m_nand_, read(INVALID_LBA_UNDER_RANGE))
+		.Times(CALLED_TIME_ZERO);
 
-	invoker.setCommand(new ReadCommand(&ssd_, -1));
+	invoker.setCommand(new ReadCommand(&ssd_, INVALID_LBA_UNDER_RANGE));
 	invoker.executeCommand();
 
-	EXPECT_THAT(invoker.getResult(), Eq(""));
+	EXPECT_THAT(invoker.getResult(), Eq(EMPTY_STRING));
 
-	EXPECT_CALL(m_nand_, read(100))
-		.Times(0);
+	EXPECT_CALL(m_nand_, read(INVALID_LBA_OVER_RANGE))
+		.Times(CALLED_TIME_ZERO);
 
-	invoker.setCommand(new ReadCommand(&ssd_, 100));
+	invoker.setCommand(new ReadCommand(&ssd_, INVALID_LBA_OVER_RANGE));
 	invoker.executeCommand();
 
-	EXPECT_THAT(invoker.getResult(), Eq(""));
+	EXPECT_THAT(invoker.getResult(), Eq(EMPTY_STRING));
 }
 
 TEST_F(SSDCommandInvokerTest, Read_test_not_written_lba) {
 	{
-		EXPECT_CALL(m_nand_, write(20, "0x1289CDEF"))
-			.Times(1);
-		EXPECT_CALL(m_nand_, read(20))
-			.WillOnce(Return("0x1289CDEF"));
-		EXPECT_CALL(m_nand_, read(10))
-			.WillOnce(Return("0x00000000"));
+		EXPECT_CALL(m_nand_, write(NORMAL_LBA_NON_ZERO, NORMAL_VALUE_1289CDEF))
+			.Times(CALLED_TIME_ONE);
+		EXPECT_CALL(m_nand_, read(NORMAL_LBA_NON_ZERO))
+			.WillOnce(Return(NORMAL_VALUE_1289CDEF));
+		EXPECT_CALL(m_nand_, read(NORMAL_LBA_10))
+			.WillOnce(Return(NORMAL_VALUE_ZERO));
 	}
 
-	int address = 20;
-	std::string data = "0x1289CDEF";
-	invoker.setCommand(new WriteCommand(&ssd_, address, data));
+	invoker.setCommand(new WriteCommand(&ssd_, NORMAL_LBA_NON_ZERO, NORMAL_VALUE_1289CDEF));
 	EXPECT_NO_THROW(invoker.executeCommand());
 
-	invoker.setCommand(new ReadCommand(&ssd_, 20));
+	invoker.setCommand(new ReadCommand(&ssd_, NORMAL_LBA_NON_ZERO));
 	invoker.executeCommand();
-	EXPECT_THAT(invoker.getResult(), Eq("0x1289CDEF"));
+	EXPECT_THAT(invoker.getResult(), Eq(NORMAL_VALUE_1289CDEF));
 
-	invoker.setCommand(new ReadCommand(&ssd_, 10));
+	invoker.setCommand(new ReadCommand(&ssd_, NORMAL_LBA_10));
 	invoker.executeCommand();
-	EXPECT_THAT(invoker.getResult(), Eq("0x00000000"));
+	EXPECT_THAT(invoker.getResult(), Eq(NORMAL_VALUE_ZERO));
 }
