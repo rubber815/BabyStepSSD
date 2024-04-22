@@ -8,6 +8,22 @@
 #include "INAND.cpp"
 #include "SSD.hpp"
 
+SSD::SSD() {
+	std::ifstream readFromWriteBuffer;
+	readFromWriteBuffer.open(WRITE_BUFFER_FILE_NAME);
+
+	if (readFromWriteBuffer.is_open() == false) {
+		std::ofstream outputFile(WRITE_BUFFER_FILE_NAME);
+		if (!outputFile) {
+			std::cout << ERR::OPEN_WRITING_FILE_FAIL << std::endl;
+		}
+		else {
+			outputFile << "0" << std::endl;
+			outputFile.close();
+		}
+	}
+}
+
 void SSD::selectNAND(INAND* nand) {
 	nand_ = nand;
 }
@@ -90,12 +106,11 @@ void SSD::erase(int lba, int size) {
 	std::cout << lba << " " << size << std::endl;
 }
 
-bool SSD::updateWriteBuffer(char* argv[]) {
+bool SSD::updateWriteBuffer(std::string cmd, int lba, std::string argv3) {
 	int count = 0;
-	std::string cmd = argv[1];
 	
 	if ((cmd == "W") || (cmd == "E")) {
-		count = AddCmdWriteBuffer(argv);
+		count = AddCmdWriteBuffer(cmd, lba, argv3);
 		if (count == -1) return false;
 		if (count == 10) {
 			while (flushWriteBuffer() == false);
@@ -185,11 +200,10 @@ std::string SSD::readWriteBuffer(int lba) {
 	return return_data;
 }
 
-int SSD::AddCmdWriteBuffer(char* argv[]) {
+int SSD::AddCmdWriteBuffer(std::string cmd, int lba, std::string argv3) {
 	std::vector<std::string> v;
-	std::string str_argv1(argv[1]);
-	std::string str_argv2(argv[2]);
-	std::string str_argv3(argv[3]);
+	int new_lba = lba;
+	std::string str_argv3 = argv3;
 	std::string tmp, input_str;
 	int count;
 
@@ -210,8 +224,8 @@ int SSD::AddCmdWriteBuffer(char* argv[]) {
 
 			if (old_cmd == "W") {
 				// new command : write
-				if (str_argv1 == "W") {
-					if (old_lba == stoi(str_argv2)) {
+				if (cmd == "W") {
+					if (old_lba == new_lba) {
 						// same lba
 					}
 					else {
@@ -219,8 +233,8 @@ int SSD::AddCmdWriteBuffer(char* argv[]) {
 					}
 				}
 				// new command : erase
-				else if (str_argv1 == "E") {
-					if ((stoi(str_argv2) <= old_lba) && ((stoi(str_argv2) + stoi(str_argv3)) > old_lba)) {
+				else if (cmd == "E") {
+					if ((new_lba <= old_lba) && ((new_lba + stoi(str_argv3)) > old_lba)) {
 						// same lba (range)
 					}
 					else {
@@ -230,14 +244,13 @@ int SSD::AddCmdWriteBuffer(char* argv[]) {
 			}
 			else if (old_cmd == "E") {
 				// new command : write
-				if (str_argv1 == "W") {
+				if (cmd == "W") {
 					// erase after write
 					v.push_back(tmp);
 				}
 				// new command : erase
-				else if (str_argv1 == "E") {
+				else if (cmd == "E") {
 					int old_size = stoi(old_arg3);
-					int new_lba = stoi(str_argv2);
 					int new_size = stoi(str_argv3);
 
 					if (old_lba > new_lba) {
@@ -261,12 +274,12 @@ int SSD::AddCmdWriteBuffer(char* argv[]) {
 					else {
 						if ((old_lba + old_size) >= new_lba) {
 							if ((old_lba + old_size) >= (new_lba + new_size)) {
-								str_argv2 = std::to_string(old_lba);
+								new_lba = old_lba;
 								str_argv3 = std::to_string(old_size);
 							}
 							else {
 								if (((new_lba + new_size) - old_lba) <= 10) {
-									str_argv2 = std::to_string(old_lba);
+									new_lba = old_lba;
 									str_argv3 = std::to_string((new_lba + new_size) - old_lba);
 								}
 								else {
@@ -282,7 +295,7 @@ int SSD::AddCmdWriteBuffer(char* argv[]) {
 			}
 		}
 
-		input_str = str_argv1 + " " + str_argv2 + " " + str_argv3;
+		input_str = cmd + " " + std::to_string(new_lba) + " " + str_argv3;
 
 		v.push_back(input_str);
 
@@ -328,14 +341,16 @@ WriteCommand::WriteCommand(SSD* ssd, int address, const std::string& data)
 	: ssd(ssd), address(address), data(data) {}
 
 void WriteCommand::execute() {
-	ssd->write(address, data);
+	if (ssd->updateWriteBuffer("W", address, data) == false)
+		ssd->write(address, data);
 }
 
 EraseCommand::EraseCommand(SSD* ssd, int startAddress, int endAddress)
 	: ssd(ssd), startAddress(startAddress), endAddress(endAddress) {}
 
 void EraseCommand::execute() {
-	ssd->erase(startAddress, endAddress);
+	if (ssd->updateWriteBuffer("E", startAddress, std::to_string(endAddress)) == false)
+		ssd->erase(startAddress, endAddress);
 }
 
 FlushCommand::FlushCommand(SSD* ssd)
