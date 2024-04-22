@@ -8,19 +8,34 @@
 #include "INAND.cpp"
 #include "SSD.hpp"
 
+#define NAND_DEFAULT_VALUE "0x00000000"
+
 SSD::SSD() {
 	std::ifstream readFromWriteBuffer;
 	readFromWriteBuffer.open(WRITE_BUFFER_FILE_NAME);
 
 	if (readFromWriteBuffer.is_open() == false) {
-		std::ofstream outputFile(WRITE_BUFFER_FILE_NAME);
-		if (!outputFile) {
-			std::cout << ERR::OPEN_WRITING_FILE_FAIL << std::endl;
-		}
-		else {
+		std::vector<std::string> empty_vector;
+		WriteDatatoWriteBuffer(empty_vector);
+	}
+}
+
+void SSD::WriteDatatoWriteBuffer(std::vector<std::string> data) {
+	std::ofstream outputFile(WRITE_BUFFER_FILE_NAME);
+	if (!outputFile) {
+		std::cout << ERR::OPEN_WRITING_FILE_FAIL << std::endl;
+	}
+	else {
+		int count = data.size();
+		if (count == 0) 
 			outputFile << "0" << std::endl;
-			outputFile.close();
+		else {
+			outputFile << count << std::endl;
+			for (int i = 0; i < count; i++) {
+				outputFile << data[i] << std::endl;
+			}
 		}
+		outputFile.close();
 	}
 }
 
@@ -84,10 +99,10 @@ std::string SSD::read(int lba) {
 	}
 
 	std::string value = readWriteBuffer(lba);
-	if (value == "FAIL") {
+	if (value == "FAIL") 
 		value = nand_->read(lba);
-		writeToResultFile(value);
-	}
+
+	writeToResultFile(value);
 
 	return value;
 }
@@ -109,16 +124,13 @@ void SSD::erase(int lba, int size) {
 bool SSD::updateWriteBuffer(std::string cmd, int lba, std::string argv3) {
 	int count = 0;
 	
-	if ((cmd == "W") || (cmd == "E")) {
-		count = AddCmdWriteBuffer(cmd, lba, argv3);
-		if (count == -1) return false;
-		if (count == 10) {
-			while (flushWriteBuffer() == false);
-		}
-
-		return true;
+	count = AddCmdWriteBuffer(cmd, lba, argv3);
+	if (count == -1) return false;
+	if (count == 10) {
+		while (flushWriteBuffer() == false);
 	}
-	return false;
+
+	return true;
 }
 
 bool SSD::flushWriteBuffer(void) {
@@ -151,15 +163,8 @@ bool SSD::flushWriteBuffer(void) {
 		return false;
 	}
 
-	std::ofstream outputFile(WRITE_BUFFER_FILE_NAME);
-	if (!outputFile) {
-		std::cout << "Failed to open file for writing." << std::endl;
-		return false;
-	}
-	else {
-		outputFile << "0" << std::endl;
-		outputFile.close();
-	}
+	std::vector<std::string> empty_vector;
+	WriteDatatoWriteBuffer(empty_vector);
 
 	return true;
 }
@@ -301,27 +306,12 @@ int SSD::AddCmdWriteBuffer(std::string cmd, int lba, std::string argv3) {
 
 		readFromWriteBuffer.close();
 	}
-	else {
+	else 
 		std::cout << "Failed to open file for reading." << std::endl;
-		return -1;
-	}
 
 	count = (int)(v.size());
 
-	std::ofstream outputFile(WRITE_BUFFER_FILE_NAME);
-	if (!outputFile) {
-		std::cout << "Failed to open file for writing." << std::endl;
-		return -1;
-	}
-	else {
-		outputFile << count << std::endl;
-		std::cout << count << std::endl;
-		for (int i = 0; i < count; i++) {
-			outputFile << v[i] << std::endl;
-			std::cout << v[i] << std::endl;
-		}
-		outputFile.close();
-	}
+	WriteDatatoWriteBuffer(v);
 
 	return count;
 }

@@ -33,6 +33,8 @@ public:
 	};
 	SSD();
 
+	void WriteDatatoWriteBuffer(std::vector<std::string> data);
+
 	void selectNAND(INAND* nand);
 
 	void write(int lba, std::string value);
