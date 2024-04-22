@@ -7,7 +7,7 @@
 #include <sstream>
 #include <cstdlib> // For system() function
 #include <io.h>
-#include "Logger.cpp"
+#include "Logger.hpp"
 
 #define APP_NAME "ssd "
 
@@ -315,7 +315,7 @@ void doRunner(char* path) {
 		std::cout << funcName << " --- Run...";
 
 		if (result) {
-			std::cout << "Pass" << std::endl;
+			std::cout << "PASS!" << std::endl;
 		}
 		else {
 			std::cout << "FAIL!" << std::endl;
@@ -339,7 +339,6 @@ int main(int argc, char* argv[]) {
 	}
 
 	std::string command, operation, lba, endlba, value, size;
-	std::string cmd = "ssd ";
 
 	while (true) {
 		std::cout << "Welcome to ShellProgram!!: "; // Updated prompt
