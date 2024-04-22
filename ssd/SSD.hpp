@@ -7,6 +7,7 @@ const int MAX_LBA = 99;
 const int VALUE_LENGTH = 10;
 const std::string PREFIX_VALUE = "0x";
 const std::string RESULT_FILE_NAME = "result.txt";
+const std::string WRITE_BUFFER_FILE_NAME = "writebuffer.txt";
 
 namespace ERR {
 	const std::string INVALID_LBA = "lba is incorrect";
@@ -27,6 +28,7 @@ public:
 		READ = 0,
 		WRITE,
 		ERASE,
+		FLUSH,
 		INVALIDCMD
 	};
 
@@ -38,6 +40,9 @@ public:
 
 	void erase(int lba, int size);
 
+	bool updateWriteBuffer(char* argv[]);
+
+	bool flushWriteBuffer(void);
 private:
 	INAND* nand_;
 
@@ -48,6 +53,10 @@ private:
 	void checkValue(std::string value);
 
 	void writeToResultFile(std::string value);
+
+	int AddCmdWriteBuffer(char* argv[]);
+
+	bool ReadWriteBuffer(char* argv[]);
 };
 
 // Interface for Command

@@ -76,6 +76,10 @@ bool verifyCommandFormat(const std::string& command) {
 		return true;
 	}
 
+	if (op == "flush") {
+		return true;
+	}
+
 	if (op == "write") {
 		iss >> lba >> val;
 
@@ -173,6 +177,8 @@ void help() {
 	std::cout << "*		format: write <LBA> <VALUE>" << std::endl;
 	std::cout << "* read: read from SSD" << std::endl;
 	std::cout << "*		format: read <LBA>" << std::endl;
+	std::cout << "* flush: execute all cmd & clear writebuffer" << std::endl;
+	std::cout << "*		format: flush" << std::endl;
 	std::cout << "* fullwrite: write from LBA numbers 0 to 99." << std::endl;
 	std::cout << "*		format: fullwrite <VALUE>" << std::endl;
 	std::cout << "* fullread: read from LBA numbers 0 to 99." << std::endl;
@@ -244,6 +250,11 @@ bool fullRead(bool compare, std::string comp_val) {
 				return false;
 		}
 	}
+}
+
+void flush(void) {
+	LOG_FUNCTION_CALL("");
+	system(makeSSDCommand("F", "", "").c_str());
 }
 
 bool testApp1() {
@@ -389,6 +400,9 @@ int main(int argc, char* argv[]) {
 		}
 		else if (operation == "fullread") {
 			fullRead(false, "");
+		}
+		else if (operation == "flush") {
+			flush();
 		}
 		/*TestApp commands*/
 		else if (operation == "testapp1") {
