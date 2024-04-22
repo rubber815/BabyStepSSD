@@ -32,26 +32,59 @@ void writeToTestResultFile(std::string value) {
 
 }
 
-bool testApp3() {
-	/*	Full Write + ReadCompare
-	1. fullwrite
-	2. fullread + readcompare
-	*/
+bool FullRead10Compare() {
 	const std::string input1 = "0xABCDEFAB";
-	for (int lba = 0; lba < 100; lba++) {
+	const std::string input2 = "0xEFFFFFFF";
+	const std::string input3 = "0x12345678";
+
+	// Initial Write
+	for (int lba = 0; lba < 30; lba++) {
 		std::string cmd = "ssd W ";
 		cmd += std::to_string(lba);
 		cmd += " " + input1;
 		system(cmd.c_str());
 	}
-	for (int lba = 0; lba < 100; lba++) {
+
+	for (int lba = 30; lba < 70; lba++) {
+		std::string cmd = "ssd W ";
+		cmd += std::to_string(lba);
+		cmd += " " + input2;
+		system(cmd.c_str());
+	}
+
+	for (int lba = 70; lba < 100; lba++) {
+		std::string cmd = "ssd W ";
+		cmd += std::to_string(lba);
+		cmd += " " + input3;
+		system(cmd.c_str());
+	}
+
+	// Compare
+	for (int lba = 0; lba < 30; lba++) {
 		std::string cmd = "ssd R ";
 		cmd += std::to_string(lba);
 		system(cmd.c_str());
 
-		// Compare
 		std::string read_val = readFromSSDResultFile();
 		if (read_val != input1)
+			return false;
+	}
+	for (int lba = 30; lba < 70; lba++) {
+		std::string cmd = "ssd R ";
+		cmd += std::to_string(lba);
+		system(cmd.c_str());
+
+		std::string read_val = readFromSSDResultFile();
+		if (read_val != input2)
+			return false;
+	}
+	for (int lba = 70; lba < 100; lba++) {
+		std::string cmd = "ssd R ";
+		cmd += std::to_string(lba);
+		system(cmd.c_str());
+
+		std::string read_val = readFromSSDResultFile();
+		if (read_val != input3)
 			return false;
 	}
 	return true;
@@ -59,7 +92,7 @@ bool testApp3() {
 
 
 int main(int argc, char* argv[]) {
-	bool ret = testApp3();
+	bool ret = FullRead10Compare();
 	if (ret) {
 		writeToTestResultFile("Pass");
 	}
