@@ -265,6 +265,7 @@ void doRunner(char* path) {
 		result = false;
 		std::getline(runnerFile, funcName);
 
+		LOG_FUNCTION_CALL(funcName + " --- Run...");
 		std::cout << funcName << " --- Run...";
 		if (funcName == "testApp1") {
 			result = testApp1();
@@ -281,9 +282,11 @@ void doRunner(char* path) {
 
 		if (result) {
 			std::cout << "PASS!" << std::endl;
+			LOG_FUNCTION_CALL(funcName + " PASS!");
 		}
 		else {
 			std::cout << "FAIL!" << std::endl;
+			LOG_FUNCTION_CALL(funcName + " FAIL!");
 			break;
 		}
 	}

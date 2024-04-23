@@ -11,6 +11,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "솔루션 항목", "솔루�
 	ProjectSection(SolutionItems) = preProject
 		.editconfig = .editconfig
 		.gitignore = .gitignore
+		run_list.lst = run_list.lst
+		run_list_fail.lst = run_list_fail.lst
+		TestGuide.lst = TestGuide.lst
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shell", "shell\shell.vcxproj", "{D7C4E96F-58D7-4F36-81AB-A0B2F6458FDA}"
