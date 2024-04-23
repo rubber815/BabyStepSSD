@@ -116,7 +116,7 @@ bool verifyCommandFormat(const std::string& command) {
 		try {
 			checkLbaRange(stoi(lba));
 			checkLbaRange(stoi(lba) + stoi(size) - 1);
-			checkEraseSize(stoi(size));
+			//checkEraseSize(stoi(size));
 		}
 		catch (std::exception e) {
 			return false;
@@ -131,7 +131,7 @@ bool verifyCommandFormat(const std::string& command) {
 		try {
 			checkLbaRange(stoi(lba));
 			checkLbaRange(stoi(endlba) - 1);
-			checkEraseSize(stoi(endlba) - stoi(lba));
+			//checkEraseSize(stoi(endlba) - stoi(lba));
 		}
 		catch (std::exception e) {
 			return false;

@@ -133,6 +133,17 @@ public:
 	}
 
 	void execute() override {
+		int erase_size = stoi(m_size);
+		int erase_lba = stoi(m_lba);
+		while (erase_size > 10) {
+			std::string str = makeSSDCommand("E", m_lba, "10").c_str();
+			LOG_FUNCTION_CALL(str);
+			system(str.c_str());
+			erase_lba += 10;
+			erase_size -= 10;
+			m_lba = std::to_string(erase_lba);
+			m_size = std::to_string(erase_size);
+		}
 		std::string str = makeSSDCommand("E", m_lba, m_size).c_str();
 		LOG_FUNCTION_CALL(str);
 		system(str.c_str());
@@ -150,8 +161,17 @@ public:
 	}
 
 	void execute() override {
-		int size = stoi(m_end_lba) - stoi(m_start_lba);
-		std::string str = makeSSDCommand("E", m_start_lba, std::to_string(size)).c_str();
+		int erase_size = stoi(m_end_lba) - stoi(m_start_lba);
+		int erase_lba = stoi(m_start_lba);
+		while (erase_size > 10) {
+			std::string str = makeSSDCommand("E", m_start_lba, "10").c_str();
+			LOG_FUNCTION_CALL(str);
+			system(str.c_str());
+			erase_lba += 10;
+			erase_size -= 10;
+			m_start_lba = std::to_string(erase_lba);
+		}
+		std::string str = makeSSDCommand("E", m_start_lba, std::to_string(erase_size)).c_str();
 		LOG_FUNCTION_CALL(str);
 		system(str.c_str());
 	}
