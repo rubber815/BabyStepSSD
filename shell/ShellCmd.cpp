@@ -133,7 +133,9 @@ public:
 	}
 
 	void execute() override {
-		system(makeSSDCommand("E", m_lba, m_size).c_str());
+		std::string str = makeSSDCommand("E", m_lba, m_size).c_str();
+		LOG_FUNCTION_CALL(str);
+		system(str.c_str());
 	}
 };
 
@@ -149,7 +151,9 @@ public:
 
 	void execute() override {
 		int size = stoi(m_end_lba) - stoi(m_start_lba);
-		system(makeSSDCommand("E", m_start_lba, std::to_string(size)).c_str());
+		std::string str = makeSSDCommand("E", m_start_lba, std::to_string(size)).c_str();
+		LOG_FUNCTION_CALL(str);
+		system(str.c_str());
 	}
 };
 
