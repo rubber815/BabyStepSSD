@@ -1,0 +1,51 @@
+---------------------------------------------------
+Logger Test Guide
+
+- modify shell/main.cpp 
+#define LOGGER_TEST 1
+
+- run
+/shell.exe
+Enter a command: loggertest
+
+---------------------------------------------------
+SSD Test
+
+ssd R 1
+ssd W 1 0x11111111 (writebuffer.txt)
+ssd R 1 (result.txt)
+ssd E 0 1 (writebuffer.txt)
+ssd F (nand.txt)
+
+---------------------------------------------------
+Shell Test
+
+help
+
+hello
+INVALID COMMAND
+
+testapp1
+testapp2
+
+fullwrite 0x1234ABCD
+fullread
+
+read 3
+write 3 0x33333333
+read 3
+
+erase 0 5 (writebuffer.txt)
+read 5
+flush (nand.txt)
+
+erase_range 20 30 (writebuffer.txt)
+read 25
+flush (nand.txt)
+
+exit
+---------------------------------------------------
+Shell test scenario
+
+run_list.lst
+run_list_fail.lst (can be success source modify with )
