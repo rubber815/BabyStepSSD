@@ -20,20 +20,6 @@ class SSDTest : public testing::Test {
 protected:
 	void SetUp() override {
 		ssd_.selectNAND(&m_nand_);
-
-		/*for (int j = 0; j < 2; j++) {
-			for (int i = 0; i < 100; i++) {
-				ssd_.erase(i, 1);
-			}
-		}*/
-
-		/*if (std::remove("nand.txt") != 0) {
-			std::cout << "NAND REMOVE FAIL" << std::endl;
-		}
-
-		if (std::remove("writebuffer.txt") != 0) {
-			std::cout << "WRITEBUFFER REMOVE FAIL" << std::endl;
-		}*/
 	}
 public:
 	SSD ssd_;
