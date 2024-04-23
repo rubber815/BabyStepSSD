@@ -12,6 +12,8 @@ protected:
 	void SetUp() override {
 		ssd_.selectNAND(&b_nand_);
 
+		std::remove("nand.txt");
+
 		for (int i = 0; i < 100; i++)
 			b_nand_.write(i, NORMAL_VALUE_ZERO);
 	}
@@ -22,11 +24,14 @@ public:
 
 TEST(NANDTest, Nand_single_write_read_test) {
 	BabyStepNand bsn;
+	std::remove("nand.txt");
+
 	bsn.write(NORMAL_LBA_NON_ZERO, NORMAL_VALUE_AAAABBBB);
 	EXPECT_EQ(NORMAL_VALUE_AAAABBBB, bsn.read(NORMAL_LBA_NON_ZERO));
 }
 
 TEST_F(SSDTestWithBabyStepNand, Write_lba_test_with_BabyStep) {
+
 	ssd_.write(NORMAL_LBA_NON_ZERO, NORMAL_VALUE_0000AAAA);
 	EXPECT_EQ(NORMAL_VALUE_0000AAAA, ssd_.read(NORMAL_LBA_NON_ZERO));
 }
