@@ -10,9 +10,8 @@ using namespace testing;
 class SSDTestWithBabyStepNand : public testing::Test {
 protected:
 	void SetUp() override {
-		ssd_.selectNAND(&b_nand_);
-
 		std::remove("nand.txt");
+		ssd_.selectNAND(&b_nand_);
 
 		for (int i = 0; i < 100; i++)
 			b_nand_.write(i, NORMAL_VALUE_ZERO);
@@ -23,8 +22,9 @@ public:
 };
 
 TEST(NANDTest, Nand_single_write_read_test) {
-	BabyStepNand bsn;
 	std::remove("nand.txt");
+
+	BabyStepNand bsn;
 
 	bsn.write(NORMAL_LBA_NON_ZERO, NORMAL_VALUE_AAAABBBB);
 	EXPECT_EQ(NORMAL_VALUE_AAAABBBB, bsn.read(NORMAL_LBA_NON_ZERO));
