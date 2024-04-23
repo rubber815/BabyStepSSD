@@ -87,7 +87,8 @@ void SSD::write(int lba, std::string value) {
 		return;
 	}
 
-	nand_->write(lba, value);
+	if (updateWriteBuffer("W", lba, value) == false)
+		nand_->write(lba, value);
 }
 
 std::string SSD::read(int lba) {
@@ -117,8 +118,10 @@ void SSD::erase(int lba, int size) {
 		return;
 	}
 
-	nand_->erase(lba, size);
-	std::cout << lba << " " << size << std::endl;
+	if (updateWriteBuffer("E", lba, std::to_string(size)) == false)
+		nand_->erase(lba, size);
+
+	//std::cout << lba << " " << size << std::endl;
 }
 
 bool SSD::updateWriteBuffer(std::string cmd, int lba, std::string argv3) {
@@ -126,7 +129,7 @@ bool SSD::updateWriteBuffer(std::string cmd, int lba, std::string argv3) {
 	
 	count = AddCmdWriteBuffer(cmd, lba, argv3);
 	if (count == -1) return false;
-	if (count == 10) {
+	if (count >= 10) {
 		while (flushWriteBuffer() == false);
 	}
 
@@ -150,10 +153,10 @@ bool SSD::flushWriteBuffer(void) {
 			readFromWriteBuffer >> old_arg3;
 
 			if (old_cmd == "W") {
-				write(old_lba, old_arg3);
+				nand_->write(old_lba, old_arg3);
 			}
 			else if (old_cmd == "E") {
-				erase(old_lba, stoi(old_arg3));
+				nand_->erase(old_lba, stoi(old_arg3));
 			}
 		}
 		readFromWriteBuffer.close();
@@ -306,8 +309,10 @@ int SSD::AddCmdWriteBuffer(std::string cmd, int lba, std::string argv3) {
 
 		readFromWriteBuffer.close();
 	}
-	else 
+	else {
 		std::cout << "Failed to open file for reading." << std::endl;
+		return -1;
+	}
 
 	count = (int)(v.size());
 
@@ -331,16 +336,14 @@ WriteCommand::WriteCommand(SSD* ssd, int address, const std::string& data)
 	: ssd(ssd), address(address), data(data) {}
 
 void WriteCommand::execute() {
-	if (ssd->updateWriteBuffer("W", address, data) == false)
-		ssd->write(address, data);
+	ssd->write(address, data);
 }
 
 EraseCommand::EraseCommand(SSD* ssd, int startAddress, int endAddress)
 	: ssd(ssd), startAddress(startAddress), endAddress(endAddress) {}
 
 void EraseCommand::execute() {
-	if (ssd->updateWriteBuffer("E", startAddress, std::to_string(endAddress)) == false)
-		ssd->erase(startAddress, endAddress);
+	ssd->erase(startAddress, endAddress);
 }
 
 FlushCommand::FlushCommand(SSD* ssd)

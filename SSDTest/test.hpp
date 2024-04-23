@@ -22,5 +22,6 @@ const int INVALID_LBA_OVER_RANGE = 101;
 
 const int CALLED_TIME_ZERO = 0;
 const int CALLED_TIME_ONE = 1;
+const int CALLED_TIME_TEN = 10;
 
 const std::string EMPTY_STRING = "";
